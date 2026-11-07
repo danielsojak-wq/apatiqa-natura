@@ -34,6 +34,7 @@
   --max: 1180px;
   --okraj: clamp(20px, 5vw, 56px);
   --zrno: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='z'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23z)'/%3E%3C/svg%3E");
+  --vlakna: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .35' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .33 0 0 0 0 .2 0 0 0 .32 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)'/%3E%3C/svg%3E");
   --lisek: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%236E7F4F' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M12 21c0-6 3-10 8-12-1 7-4 11-8 12Z'/%3E%3Cpath d='M12 21c0-5-2.5-8.5-7-10 .8 5.8 3.3 9 7 10Z'/%3E%3Cpath d='M12 21v-5'/%3E%3C/svg%3E");
 }
 
@@ -86,7 +87,8 @@ h1, h2, h3 {
 .btn:hover { background: var(--les-2); }
 .btn:active { transform: translateY(1px); }
 .btn[disabled] { opacity: 0.45; cursor: default; }
-.btn--submit { width: 100%; min-height: 58px; }
+.btn--submit { width: 100%; min-height: 58px; background: var(--mesicek); color: var(--les); }
+.btn--submit:hover { background: var(--mesicek-svetly); }
 
 .btn--mesicek { background: var(--mesicek); color: var(--les); }
 .btn--mesicek:hover { background: var(--mesicek-svetly); }
@@ -191,27 +193,47 @@ h1, h2, h3 {
 
 .herbar {
   position: relative;
-  width: 100%; max-width: 560px; height: clamp(320px, 88vw, 420px);
+  width: 100%; max-width: 560px; height: clamp(360px, 98vw, 440px);
   margin: 0 auto;
 }
 
 .arch {
   --x: 0%; --y: 0px; --r: 0deg; --d: 0s;
+  --paska-x: 22%; --paska-y: 80%; --paska-r: -24deg;
   position: absolute; left: 50%; top: 4%;
-  width: clamp(148px, 40vw, 224px);
-  margin: 0; padding: 12px 12px 14px;
-  background: linear-gradient(160deg, #FDFAF2, #F6EFE0);
+  width: clamp(150px, 41vw, 236px);
+  margin: 0; padding: 11px 11px 12px;
+  background:
+    radial-gradient(120% 90% at 20% 0%, rgba(255, 255, 255, .55), transparent 60%),
+    linear-gradient(165deg, #FBF6EA, #F1E8D4);
   color: var(--inkoust);
-  border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 28px 50px -18px rgba(5, 15, 7, .65), 0 4px 10px rgba(5, 15, 7, .18);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .7) inset,
+    0 -1px 0 rgba(120, 95, 60, .12) inset,
+    0 30px 50px -20px rgba(5, 15, 7, .7),
+    0 6px 14px rgba(5, 15, 7, .22);
   transform: translateX(-50%) translate(var(--x), var(--y)) rotate(var(--r));
   transition: transform .7s cubic-bezier(.2, .75, .2, 1);
   animation: rozdat 1.1s cubic-bezier(.2, .75, .2, 1) backwards;
   animation-delay: var(--d);
 }
-.arch--1 { --x: -58%; --y: clamp(40px, 9vw, 64px); --r: -9deg; --d: .15s; z-index: 1; }
-.arch--2 { --x: 0%;   --y: 0px;  --r: 2deg;  --d: .3s;  z-index: 3; }
-.arch--3 { --x: 57%;  --y: clamp(54px, 12vw, 84px); --r: 9deg;  --d: .45s; z-index: 2; }
+/* tenký tiskový rámeček uvnitř archu */
+.arch::before {
+  content: ''; position: absolute; inset: 5px; z-index: 0;
+  border: 1px solid rgba(138, 106, 91, .22); pointer-events: none;
+}
+/* vlákna papíru přes celý arch i kresbu — měkká ilustrace pak působí jako tisk */
+.arch::after {
+  content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit;
+  background-image: var(--vlakna); background-size: 140px;
+  mix-blend-mode: multiply; opacity: .5; pointer-events: none;
+}
+.arch > * { position: relative; }   /* bez z-indexu: jinak by obal kresby byl samostatná vrstva a multiply by nesplynul s papírem */
+
+.arch--1 { --paska-x: 16%; --paska-y: 84%; --paska-r: -28deg; --x: -58%; --y: clamp(64px, 19vw, 96px); --r: -9deg; --d: .15s; z-index: 1; }
+.arch--2 { --paska-x: 22%; --paska-y: 80%; --paska-r: -32deg; --x: 0%;   --y: 0px;  --r: 2deg;  --d: .3s;  z-index: 3; }
+.arch--3 { --paska-x: 42%; --paska-y: 82%; --paska-r: 14deg; --x: 57%;  --y: clamp(80px, 23vw, 114px); --r: 9deg;  --d: .45s; z-index: 2; }
 
 @media (hover: hover) {
   .herbar:hover .arch--1 { --x: -66%; --r: -12deg; }
@@ -224,29 +246,53 @@ h1, h2, h3 {
 }
 
 .arch__hlava {
-  margin: 0; padding-bottom: 8px; border-bottom: 1px solid var(--linka);
+  margin: 0; padding: 2px 3px 8px; border-bottom: 1px solid rgba(138, 106, 91, .28);
   display: flex; justify-content: space-between; gap: 8px;
-  font-family: var(--mono); font-size: 9.5px; line-height: 1.2; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--text-2);
+  font-family: var(--mono); font-size: 9px; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--hlina);
 }
 
 .arch__obraz {
-  height: clamp(118px, 30vw, 184px);
+  position: relative;
+  height: clamp(112px, 28vw, 172px);
   display: flex; align-items: center; justify-content: center;
-  padding: 10px 0; overflow: hidden;
+  padding: 12px 0 8px;
 }
 .arch__obraz img {
   max-height: 100%; width: auto;
-  mix-blend-mode: multiply; filter: brightness(1.03) contrast(1.04);
+  mix-blend-mode: multiply; filter: brightness(1.04) contrast(1.08) saturate(1.06);
 }
 
-.arch figcaption {
-  padding-top: 8px; border-top: 1px solid var(--linka);
-  display: flex; flex-direction: column; gap: 3px;
+/* proužek gumované pásky přes stonek, jako v opravdovém herbáři */
+.arch__paska {
+  position: absolute; left: var(--paska-x); top: var(--paska-y);
+  width: clamp(30px, 8vw, 42px); height: clamp(9px, 2.4vw, 12px);
+  background: linear-gradient(180deg, rgba(240, 228, 200, .92), rgba(226, 210, 176, .92));
+  box-shadow: 0 1px 1.5px rgba(80, 60, 30, .25);
+  transform: translate(-50%, -50%) rotate(var(--paska-r));
+  clip-path: polygon(0 8%, 5% 0, 10% 10%, 15% 0, 100% 0, 96% 50%, 100% 100%, 12% 100%, 7% 90%, 3% 100%, 0 92%);
 }
-.arch figcaption em { font-family: var(--serif); font-size: clamp(13px, 3.4vw, 17px); line-height: 1.15; }
-.arch figcaption span {
-  font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-2);
+
+/* muzejní štítek */
+.arch__stitek {
+  position: relative; margin-top: 4px;
+  padding: 8px 9px 7px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgba(255, 253, 246, .75);
+  border: 1px solid rgba(90, 99, 80, .38);
+}
+.arch__stitek::before {
+  content: ''; position: absolute; inset: 2px;
+  border: 1px solid rgba(90, 99, 80, .16); pointer-events: none;
+}
+.arch__stitek em {
+  font-family: var(--serif); font-style: italic; font-size: clamp(13px, 3.3vw, 16.5px); line-height: 1.12;
+}
+.arch__stitek em small { font-style: normal; font-size: .72em; color: var(--text-2); }
+.arch__cesky { font-family: var(--serif); font-size: clamp(11px, 2.7vw, 13px); line-height: 1.25; }
+.arch__celed {
+  margin-top: 2px;
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2);
 }
 
 .pecet {
@@ -637,7 +683,7 @@ h1, h2, h3 {
     align-items: center;
     min-height: min(76vh, 700px);
   }
-  .herbar { height: 500px; }
+  .herbar { height: 540px; }
   .arch { top: 6%; }
   .pecet { right: 1%; top: 1%; }
 
