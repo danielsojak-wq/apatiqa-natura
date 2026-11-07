@@ -1,0 +1,249 @@
+/* Apatiqa Natura — vizuální styl podle ceníku
+   Barvy a typografie odpovídají návrhu na plátně v Claude Design. */
+
+:root {
+  --krem: #FAF5EA;        /* hlavní podklad */
+  --krem-tmavsi: #F2EAD8; /* odlišené sekce */
+  --papir: #FFFCF5;       /* pole a karty */
+  --inkoust: #26331D;     /* hlavní text */
+  --zelena: #3C5330;      /* značková zeleň, CTA */
+  --zelena-2: #55683D;
+  --zelena-3: #6E7F4F;
+  --hlina: #8A6A5B;       /* akcent, Péče o tělo */
+  --sedozelena: #5E6652;  /* sekundární text */
+  --linka: #E3DAC6;
+  --linka-silna: #C9BEA3;
+  --max: 1040px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--krem);
+  color: var(--inkoust);
+  font-family: Karla, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+img { max-width: 100%; height: auto; }
+a { color: var(--zelena); }
+
+.wrap { max-width: var(--max); margin: 0 auto; }
+
+h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  color: var(--inkoust);
+}
+
+/* ---------- HERO ---------- */
+
+.hero { padding: 72px 32px 56px; border-bottom: 1px solid var(--linka); }
+
+.hero__inner {
+  max-width: var(--max); margin: 0 auto;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;
+}
+
+.hero__flora { flex: 0 1 215px; width: 215px; mix-blend-mode: multiply; }
+
+.hero__text {
+  flex: 999 1 420px; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: 'Pinyon Script', cursive;
+  font-size: 88px; line-height: 1; color: var(--zelena);
+}
+.wordmark--sm { font-size: 40px; line-height: 1.1; color: var(--krem); }
+
+.wordmark__sub {
+  margin: -14px 0 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 36px; letter-spacing: 0.3em; text-transform: uppercase;
+}
+.wordmark__sub--sm { margin: 0; font-size: 16px; }
+
+.rule { width: 64px; height: 1px; background: #B9A98A; margin: 8px 0; }
+
+.tagline {
+  margin: 0; max-width: 620px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 25px; font-style: italic; color: var(--zelena);
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 36px;
+  background: var(--zelena); color: var(--krem);
+  border: none; border-radius: 2px; text-decoration: none; cursor: pointer;
+  font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.btn:hover { background: #2E4124; }
+.btn--submit { width: 100%; min-height: 56px; }
+.btn[disabled] { opacity: 0.5; cursor: default; }
+
+/* ---------- BADGES ---------- */
+
+.badges { padding: 40px 32px; background: var(--krem-tmavsi); }
+.badges__grid { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+
+.badge { flex: 1 1 200px; min-width: 0; display: flex; align-items: flex-start; gap: 12px; }
+.badge p { margin: 0; font-size: 15px; color: #3F4A33; }
+
+.badge__icon {
+  flex: none; width: 22px; height: 22px; margin-top: 3px;
+  background: no-repeat center / contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%236E7F4F' stroke-width='1.4'%3E%3Cpath d='M12 21c0-6 3-10 8-12-1 7-4 11-8 12Z'/%3E%3Cpath d='M12 21c0-5-2.5-8.5-7-10 .8 5.8 3.3 9 7 10Z'/%3E%3Cpath d='M12 21v-5'/%3E%3C/svg%3E");
+}
+
+/* ---------- INTRO ---------- */
+
+.intro { padding: 72px 32px; }
+.intro__inner { max-width: 720px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; gap: 18px; }
+.intro h2 { font-size: 38px; }
+.intro p { margin: 0; font-size: 17px; color: #4A5340; }
+
+.quote {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 23px !important; font-style: italic; color: var(--hlina) !important;
+}
+
+.intro__photos {
+  margin-top: 20px; display: flex; flex-wrap: wrap;
+  align-items: flex-end; justify-content: center; gap: 40px;
+}
+.intro__photos img { mix-blend-mode: multiply; }
+.intro__photos img:first-child { width: 97px; }
+.intro__photos img:last-child { width: 290px; }
+
+/* ---------- CENÍK ---------- */
+
+.cenik { padding: 8px 32px 64px; }
+.section-head { text-align: center; display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+.section-head h2 { font-size: 42px; }
+.section-head p { margin: 0; font-size: 16px; color: var(--sedozelena); }
+
+.katalog { display: flex; flex-direction: column; gap: 56px; }
+.katalog__loading { text-align: center; color: var(--sedozelena); }
+
+.kategorie__hlavicka { padding: 14px 24px; border-radius: 2px; }
+.kategorie__hlavicka h3 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 26px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--krem);
+}
+
+.polozka {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px;
+  padding: 22px 24px; border-bottom: 1px solid var(--linka);
+}
+
+.polozka__info { flex: 999 1 380px; min-width: 0; display: flex; align-items: flex-start; gap: 18px; }
+.polozka__ikona { flex: none; width: 68px; mix-blend-mode: multiply; }
+.polozka__nazev {
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 23px; font-weight: 600;
+}
+.polozka__popis { margin: 6px 0 0; font-size: 14px; color: var(--sedozelena); max-width: 500px; }
+
+.varianty { flex: 1 1 300px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-end; }
+.varianta { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.varianta__label { margin: 0; font-size: 13px; letter-spacing: 0.04em; color: var(--sedozelena); }
+.varianta__cena { color: var(--inkoust); font-weight: 600; }
+
+.stepper {
+  display: flex; align-items: center;
+  border: 1px solid var(--linka-silna); border-radius: 2px; background: var(--papir);
+}
+.stepper button {
+  width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer; color: var(--zelena);
+  font-size: 20px; line-height: 1;
+}
+.stepper output {
+  min-width: 36px; text-align: center; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: #A89C80;
+}
+.stepper output.ma-hodnotu { color: var(--zelena); }
+
+/* ---------- OBJEDNÁVKA ---------- */
+
+.objednavka { padding: 72px 32px; background: var(--krem-tmavsi); }
+.objednavka__inner { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+
+.souhrn { background: var(--papir); border: 1px solid #DED3BB; border-radius: 2px; padding: 24px 28px; }
+.souhrn__prazdno { margin: 0; text-align: center; font-size: 15px; color: var(--sedozelena); }
+.souhrn__radek {
+  display: flex; gap: 16px; align-items: baseline; justify-content: space-between;
+  border-bottom: 1px dotted #DED3BB; padding-bottom: 10px; margin-bottom: 12px;
+}
+.souhrn__radek p { margin: 0; font-size: 15px; }
+.souhrn__celkem { display: flex; justify-content: space-between; align-items: baseline; padding-top: 6px; }
+.souhrn__celkem p { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; }
+.souhrn__celkem .popisek { font-size: 22px; font-weight: 600; }
+.souhrn__celkem .castka { font-size: 26px; font-weight: 700; color: var(--zelena); }
+
+.form { display: flex; flex-direction: column; gap: 20px; }
+.form__row { display: flex; flex-wrap: wrap; gap: 20px; }
+.form__row .field { flex: 1 1 240px; min-width: 0; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; border: none; }
+.field label, .field legend {
+  padding: 0; font-size: 13px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--sedozelena);
+}
+.field input[type="text"], .field input[type="tel"], .field input[type="email"], .field textarea {
+  width: 100%; min-height: 48px; padding: 12px 14px;
+  background: var(--papir); border: 1px solid var(--linka-silna); border-radius: 2px;
+  color: var(--inkoust); font: inherit;
+}
+.field textarea { resize: vertical; }
+.field input:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--zelena); outline-offset: 1px; }
+
+.radios { display: flex; flex-wrap: wrap; gap: 24px; }
+.radios span { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.radios input { width: 20px; height: 20px; accent-color: var(--zelena); }
+.radios label { font-size: 16px; text-transform: none; letter-spacing: 0; color: #3F4A33; }
+
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.stav { margin: 0; font-size: 15px; }
+.stav--ok { color: var(--zelena); font-weight: 600; }
+.stav--chyba { color: #8C3B2A; font-weight: 600; }
+
+.gdpr { margin: 0; font-size: 13px; color: var(--sedozelena); }
+
+/* ---------- PATIČKA ---------- */
+
+.paticka { padding: 56px 32px; background: var(--zelena); color: #EFE7D4; }
+.paticka__top { display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between; }
+.paticka__kontakt { display: flex; flex-direction: column; gap: 6px; }
+.paticka__label { margin: 0; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: #C7D4B4; }
+.paticka__tel { margin: 0; font-size: 22px; font-weight: 600; }
+.paticka__tel a { color: var(--krem); text-decoration: none; }
+.paticka__bottom { margin-top: 32px; padding-top: 24px; border-top: 1px solid #5A7049; }
+.paticka__bottom p { margin: 0; font-size: 14px; color: #C7D4B4; }
+
+/* ---------- MOBIL ---------- */
+
+@media (max-width: 640px) {
+  .hero { padding: 48px 20px 40px; }
+  .hero__flora { flex-basis: 150px; width: 150px; }
+  .wordmark { font-size: 64px; }
+  .wordmark__sub { font-size: 26px; }
+  .badges, .intro, .cenik, .objednavka, .paticka { padding-left: 20px; padding-right: 20px; }
+  .section-head h2 { font-size: 32px; }
+  .polozka { padding: 20px 0; }
+  .kategorie__hlavicka { padding: 12px 16px; }
+  .varianty { justify-content: flex-start; }
+  .varianta { align-items: flex-start; }
+  .polozka__ikona { width: 52px; }
+}

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apatiqa Natura — přírodní péče z bylin</title>
+<meta name="description" content="Ruční výroba přírodní kosmetiky v malých várkách. Masti a balzámy, šampuky, péče o pleť a tělo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Karla:wght@400;500;600;700&family=Pinyon+Script&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero__inner">
+    <img class="hero__flora" src="assets/flowers_left.png" alt="">
+    <div class="hero__text">
+      <p class="wordmark">Apatiqa</p>
+      <p class="wordmark__sub">Natura</p>
+      <span class="rule" aria-hidden="true"></span>
+      <p class="tagline">Přírodní péče z bylin a kvalitních přírodních surovin</p>
+      <a class="btn" href="#objednavka">Sestavit objednávku</a>
+    </div>
+    <img class="hero__flora" src="assets/flowers_right.png" alt="">
+  </div>
+</header>
+
+<section class="badges">
+  <div class="wrap badges__grid">
+    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>Bez zbytečných syntetických přísad</p></div>
+    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>S láskou a péčí vyrobeno</p></div>
+    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>Malé várky, vysoká kvalita</p></div>
+    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>Ruční výroba</p></div>
+  </div>
+</section>
+
+<section class="intro">
+  <div class="intro__inner">
+    <h2>Vyrábím v malých várkách</h2>
+    <p>Masti, balzámy, šampuky i séra míchám ručně z bylin, olejů a vosků, které si sama vybírám. Nic zbytečného navíc, žádné syntetické přísady.</p>
+    <p class="quote">Přírodní kosmetika nemusí být dokonalá. Každá várka je originál.</p>
+    <div class="intro__photos">
+      <img src="assets/bottle.png" alt="Přírodní repelent Apatiqa Natura ve skleněné lahvičce s rozprašovačem">
+      <img src="assets/soap.png" alt="Peelingové mýdlo kávové se skořicí, převázané stuhou">
+    </div>
+  </div>
+</section>
+
+<section class="cenik" id="cenik">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Ceník a objednávka</h2>
+      <p>Vyberte množství u toho, co vás zajímá. Souhrn najdete níž.</p>
+    </div>
+    <div id="katalog" class="katalog">
+      <p class="katalog__loading">Načítám ceník…</p>
+    </div>
+  </div>
+</section>
+
+<section class="objednavka" id="objednavka">
+  <div class="objednavka__inner">
+    <div class="section-head">
+      <h2>Vaše objednávka</h2>
+      <p>Ozvu se vám a domluvíme termín i způsob předání.</p>
+    </div>
+
+    <div class="souhrn" id="souhrn" aria-live="polite"></div>
+
+    <form id="form" class="form" novalidate>
+      <div class="form__row">
+        <div class="field">
+          <label for="jmeno">Jméno a příjmení</label>
+          <input id="jmeno" name="jmeno" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="telefon">Telefon</label>
+          <input id="telefon" name="telefon" type="tel" autocomplete="tel" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">E-mail (nepovinné)</label>
+        <input id="email" name="email" type="email" autocomplete="email">
+      </div>
+
+      <fieldset class="field">
+        <legend>Způsob předání</legend>
+        <div class="radios">
+          <span><input id="p-osobne" name="predani" type="radio" value="Osobně" checked><label for="p-osobne">Osobně</label></span>
+          <span><input id="p-posta" name="predani" type="radio" value="Poštou"><label for="p-posta">Poštou</label></span>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="adresa">Adresa (jen při zaslání poštou)</label>
+        <textarea id="adresa" name="adresa" rows="2"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="poznamka">Poznámka</label>
+        <textarea id="poznamka" name="poznamka" rows="3"></textarea>
+      </div>
+
+      <!-- honeypot: skryté pole, lidé ho nevyplní, roboti ano -->
+      <div class="hp" aria-hidden="true">
+        <label for="web">Web</label>
+        <input id="web" name="web" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button id="odeslat" class="btn btn--submit" type="submit">Odeslat objednávku</button>
+      <p class="stav" id="stav" role="status"></p>
+      <p class="gdpr">Vyplněné údaje slouží jen k vyřízení objednávky a k tomu, abych se vám mohla ozvat. Nikam dál je nepředávám.</p>
+    </form>
+  </div>
+</section>
+
+<footer class="paticka">
+  <div class="wrap paticka__top">
+    <div>
+      <p class="wordmark wordmark--sm">Apatiqa</p>
+      <p class="wordmark__sub wordmark__sub--sm">Natura</p>
+    </div>
+    <div class="paticka__kontakt">
+      <p class="paticka__label">Pro objednávky a dotazy</p>
+      <p class="paticka__tel"><a href="tel:+420776349774">+420 776 349 774</a></p>
+    </div>
+  </div>
+  <div class="wrap paticka__bottom">
+    <p>Děkuji, že podporujete ruční výrobu a přírodní cestu péče o tělo i duši.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
