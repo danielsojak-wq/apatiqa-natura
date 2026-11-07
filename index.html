@@ -5,44 +5,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Apatiqa Natura — přírodní péče z bylin</title>
 <meta name="description" content="Ruční výroba přírodní kosmetiky v malých várkách. Masti a balzámy, šampuky, péče o pleť a tělo.">
+<meta name="theme-color" content="#1C2F20">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Karla:wght@400;500;600;700&family=Pinyon+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Pinyon+Script&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <header class="hero">
-  <div class="hero__inner">
-    <img class="hero__flora" src="assets/flowers_left.png" alt="">
+  <nav class="lista" aria-label="Hlavní navigace">
+    <a class="znacka" href="#" aria-label="Apatiqa Natura — na začátek stránky">
+      <span class="znacka__script">Apatiqa</span>
+      <span class="znacka__sub">Natura</span>
+    </a>
+    <ul class="lista__menu">
+      <li><a href="#pribeh">O výrobě</a></li>
+      <li><a href="#cenik">Ceník</a></li>
+      <li><a href="#objednavka">Objednávka</a></li>
+    </ul>
+    <a class="lista__tel" href="tel:+420776349774">+420 776 349 774</a>
+  </nav>
+
+  <div class="hero__obsah">
     <div class="hero__text">
-      <p class="wordmark">Apatiqa</p>
-      <p class="wordmark__sub">Natura</p>
-      <span class="rule" aria-hidden="true"></span>
-      <p class="tagline">Přírodní péče z bylin a kvalitních přírodních surovin</p>
-      <a class="btn" href="#objednavka">Sestavit objednávku</a>
+      <p class="kicker">Přírodní péče z bylin a kvalitních přírodních surovin</p>
+      <h1 class="hero__nadpis">
+        <span>Z bylin,</span>
+        <span>ručně,</span>
+        <em>v malých várkách.</em>
+      </h1>
+      <p class="hero__perex">Bylinné masti a balzámy, pevné šampuky, péče o pleť i tělo. Bez zbytečných syntetických přísad.</p>
+      <div class="hero__akce">
+        <a class="btn btn--mesicek" href="#cenik">Sestavit objednávku</a>
+        <a class="odkaz" href="#pribeh">Jak vyrábím</a>
+      </div>
     </div>
-    <img class="hero__flora" src="assets/flowers_right.png" alt="">
+
+    <div class="herbar" role="img" aria-label="Herbářové archy: levandule, měsíček a heřmánek">
+      <figure class="arch arch--1">
+        <p class="arch__hlava"><span>Tab. I</span><span>Mast · balzám</span></p>
+        <div class="arch__obraz"><img src="assets/levandulova.png" alt="" width="228" height="246"></div>
+        <figcaption><em>Lavandula angustifolia</em><span>Levandule lékařská</span></figcaption>
+      </figure>
+      <figure class="arch arch--2">
+        <p class="arch__hlava"><span>Tab. II</span><span>Mast · balzám</span></p>
+        <div class="arch__obraz"><img src="assets/mesickova.png" alt="" width="204" height="249"></div>
+        <figcaption><em>Calendula officinalis</em><span>Měsíček lékařský</span></figcaption>
+      </figure>
+      <figure class="arch arch--3">
+        <p class="arch__hlava"><span>Tab. III</span><span>Mast · balzám</span></p>
+        <div class="arch__obraz"><img src="assets/hermankova.png" alt="" width="189" height="204"></div>
+        <figcaption><em>Matricaria chamomilla</em><span>Heřmánek pravý</span></figcaption>
+      </figure>
+      <svg class="pecet" viewBox="0 0 120 120" aria-hidden="true">
+        <defs><path id="pecet-kruh" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+        <g class="pecet__kruh">
+          <text><textPath href="#pecet-kruh" textLength="282">Ručně míchané · malé várky · z bylin ·</textPath></text>
+        </g>
+        <path class="pecet__list" d="M60 77c0-11 5-18 14-22-2 12-7 19-14 22Zm0 0c0-9-4-15-12-18 1.5 10 6 16 12 18Zm0 0v-9"/>
+      </svg>
+    </div>
   </div>
+
+  <span class="hero__vodoznak" aria-hidden="true">Apatiqa</span>
 </header>
 
-<section class="badges">
-  <div class="wrap badges__grid">
-    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>Bez zbytečných syntetických přísad</p></div>
-    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>S láskou a péčí vyrobeno</p></div>
-    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>Malé várky, vysoká kvalita</p></div>
-    <div class="badge"><span class="badge__icon" aria-hidden="true"></span><p>Ruční výroba</p></div>
+<div class="pas" aria-hidden="true">
+  <div class="pas__stopa">
+    <div class="pas__skupina">
+      <span>Měsíček <i>Calendula officinalis</i></span>
+      <span>Heřmánek <i>Matricaria chamomilla</i></span>
+      <span>Levandule <i>Lavandula angustifolia</i></span>
+      <span>Řepík <i>Agrimonia eupatoria</i></span>
+      <span>Rozmarýn <i>Rosmarinus officinalis</i></span>
+      <span>Tymián <i>Thymus vulgaris</i></span>
+      <span>Řebříček <i>Achillea millefolium</i></span>
+      <span>Kopřiva <i>Urtica dioica</i></span>
+      <span>Třezalka <i>Hypericum perforatum</i></span>
+      <span>Kostival <i>Symphytum officinale</i></span>
+      <span>Kaštan <i>Aesculus hippocastanum</i></span>
+    </div>
+    <div class="pas__skupina">
+      <span>Měsíček <i>Calendula officinalis</i></span>
+      <span>Heřmánek <i>Matricaria chamomilla</i></span>
+      <span>Levandule <i>Lavandula angustifolia</i></span>
+      <span>Řepík <i>Agrimonia eupatoria</i></span>
+      <span>Rozmarýn <i>Rosmarinus officinalis</i></span>
+      <span>Tymián <i>Thymus vulgaris</i></span>
+      <span>Řebříček <i>Achillea millefolium</i></span>
+      <span>Kopřiva <i>Urtica dioica</i></span>
+      <span>Třezalka <i>Hypericum perforatum</i></span>
+      <span>Kostival <i>Symphytum officinale</i></span>
+      <span>Kaštan <i>Aesculus hippocastanum</i></span>
+    </div>
   </div>
+</div>
+
+<section class="zasady" aria-label="Jak vyrábím">
+  <ol class="wrap zasady__seznam">
+    <li><span class="zasady__cislo">01</span><p>Bez zbytečných syntetických přísad</p></li>
+    <li><span class="zasady__cislo">02</span><p>S láskou a péčí vyrobeno</p></li>
+    <li><span class="zasady__cislo">03</span><p>Malé várky, vysoká kvalita</p></li>
+    <li><span class="zasady__cislo">04</span><p>Ruční výroba</p></li>
+  </ol>
 </section>
 
-<section class="intro">
-  <div class="intro__inner">
-    <h2>Vyrábím v malých várkách</h2>
-    <p>Masti, balzámy, šampuky i séra míchám ručně z bylin, olejů a vosků, které si sama vybírám. Nic zbytečného navíc, žádné syntetické přísady.</p>
-    <p class="quote">Přírodní kosmetika nemusí být dokonalá. Každá várka je originál.</p>
-    <div class="intro__photos">
-      <img src="assets/bottle.png" alt="Přírodní repelent Apatiqa Natura ve skleněné lahvičce s rozprašovačem">
-      <img src="assets/soap.png" alt="Peelingové mýdlo kávové se skořicí, převázané stuhou">
+<section class="pribeh" id="pribeh">
+  <div class="wrap pribeh__mrizka">
+    <div class="pribeh__text">
+      <p class="kicker kicker--tmavy">O výrobě</p>
+      <h2>Vyrábím v malých várkách</h2>
+      <p>Masti, balzámy, šampuky i séra míchám ručně z bylin, olejů a vosků, které si sama vybírám. Nic zbytečného navíc, žádné syntetické přísady.</p>
+      <blockquote class="pribeh__citat"><p>Přírodní kosmetika nemusí být dokonalá. Každá várka je originál.</p></blockquote>
+    </div>
+    <div class="pribeh__fotky">
+      <figure class="foto foto--lahev">
+        <img src="assets/bottle.png" alt="Přírodní repelent Apatiqa Natura ve skleněné lahvičce s rozprašovačem" width="97" height="270">
+        <figcaption>Přírodní repelent</figcaption>
+      </figure>
+      <figure class="foto foto--mydlo">
+        <img src="assets/soap.png" alt="Peelingové mýdlo kávové se skořicí, převázané stuhou" width="290" height="118">
+        <figcaption>Peelingové mýdlo kávové se skořicí</figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -50,8 +135,14 @@
 <section class="cenik" id="cenik">
   <div class="wrap">
     <div class="section-head">
+      <p class="kicker kicker--tmavy">Ceník</p>
       <h2>Ceník a objednávka</h2>
       <p>Vyberte množství u toho, co vás zajímá. Souhrn najdete níž.</p>
+      <ol class="kroky">
+        <li><span>1</span>Vyberte množství v ceníku</li>
+        <li><span>2</span>Vyplňte kontakt</li>
+        <li><span>3</span>Ozvu se a domluvíme předání</li>
+      </ol>
     </div>
     <div id="katalog" class="katalog">
       <p class="katalog__loading">Načítám ceník…</p>
@@ -62,6 +153,7 @@
 <section class="objednavka" id="objednavka">
   <div class="objednavka__inner">
     <div class="section-head">
+      <p class="kicker kicker--tmavy">Objednávka</p>
       <h2>Vaše objednávka</h2>
       <p>Ozvu se vám a domluvíme termín i způsob předání.</p>
     </div>
@@ -116,11 +208,11 @@
   </div>
 </section>
 
-<footer class="paticka">
+<footer class="paticka" id="kontakt">
   <div class="wrap paticka__top">
-    <div>
-      <p class="wordmark wordmark--sm">Apatiqa</p>
-      <p class="wordmark__sub wordmark__sub--sm">Natura</p>
+    <div class="znacka znacka--velka">
+      <span class="znacka__script">Apatiqa</span>
+      <span class="znacka__sub">Natura</span>
     </div>
     <div class="paticka__kontakt">
       <p class="paticka__label">Pro objednávky a dotazy</p>
