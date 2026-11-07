@@ -438,12 +438,11 @@ h1, h2, h3 {
   font-family: var(--mono); font-size: 12px;
 }
 
-.katalog { display: flex; flex-direction: column; gap: 36px; counter-reset: tabule; }
+.katalog { display: flex; flex-direction: column; gap: 36px; }
 .katalog__loading { margin: 0; padding: 40px 0; text-align: center; color: var(--text-2); }
 .katalog__loading a { color: var(--zelena); font-weight: 600; white-space: nowrap; }
 
 .kategorie {
-  counter-increment: tabule;
   scroll-margin-top: 88px;   /* aby skok z rozcestníku neskončil pod ním */
   background: var(--papir);
   border: 1px solid var(--linka); border-radius: 6px; overflow: hidden;
@@ -455,11 +454,6 @@ h1, h2, h3 {
   position: relative; isolation: isolate; overflow: hidden;
   display: flex; align-items: baseline; gap: 16px;
   padding: 20px clamp(18px, 3vw, 32px);
-}
-.kategorie__hlavicka::before {
-  content: 'Tab. ' counter(tabule, upper-roman);
-  font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-  color: rgba(245, 238, 224, .7);
 }
 .kategorie__hlavicka::after {
   content: ''; position: absolute; inset: 0; z-index: -1;
