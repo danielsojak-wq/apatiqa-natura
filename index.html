@@ -144,6 +144,7 @@
         <li><span>3</span>Ozvu se a domluvíme předání</li>
       </ol>
     </div>
+    <nav class="rozcestnik" id="rozcestnik" aria-label="Kategorie ceníku" hidden></nav>
     <div id="katalog" class="katalog">
       <p class="katalog__loading">Načítám ceník…</p>
     </div>
@@ -186,7 +187,7 @@
       </fieldset>
 
       <div class="field">
-        <label for="adresa">Adresa (jen při zaslání poštou)</label>
+        <label for="adresa">Adresa pro zaslání poštou</label>
         <textarea id="adresa" name="adresa" rows="2"></textarea>
       </div>
 
@@ -207,6 +208,14 @@
     </form>
   </div>
 </section>
+
+<div class="kosik" id="kosik" aria-hidden="true">
+  <p class="kosik__text">
+    <span class="kosik__popisek">Vybráno</span>
+    <span><span id="kosik-pocet">0 kusů</span> · <strong id="kosik-celkem">0 Kč</strong></span>
+  </p>
+  <a class="btn btn--mesicek kosik__btn" href="#objednavka">K objednávce</a>
+</div>
 
 <footer class="paticka" id="kontakt">
   <div class="wrap paticka__top">
