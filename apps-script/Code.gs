@@ -2,8 +2,8 @@
  * Apatiqa Natura — Apps Script Web App pro objednávky z webu
  * =================================================================
  *
- * Skript je vázaný na tabulku „Objednávky – Apatiqa Natura“
- * (v tabulce: Rozšíření → Apps Script). Pracuje se třemi listy:
+ * Skript pracuje s tabulkou „Objednávky – Apatiqa Natura“ (ID níž
+ * v ID_TABULKY), se třemi listy:
  *
  *   Ceník       produkty a ceny; edituje je mamka, web je čte přes doGet
  *   Objednávky  jeden řádek na objednávku, zapisuje doPost
@@ -26,6 +26,14 @@
 /* =================================================================
    NASTAVENÍ
    ================================================================= */
+
+/**
+ * ID tabulky (část adresy mezi /d/ a /edit). Díky tomu je jedno, jestli
+ * je skript vázaný na tabulku, nebo samostatný.
+ * Samotné ID nikomu přístup nedává — tabulka ale nesmí být sdílená
+ * „Kdokoli s odkazem“, jsou v ní osobní údaje zákaznic.
+ */
+const ID_TABULKY = '1P6o3TitO6AAj8HUkCom7DNztkKcQo_IriAUA3kQkWWw';
 
 /** Názvy listů v tabulce. */
 const LISTY = {
@@ -378,7 +386,7 @@ function nejvyssiCislo(cil) {
  * Vrací { list, sloupce: { pole: číslo sloupce od 1 } }.
  */
 function otevriList(druh) {
-  const list = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LISTY[druh]);
+  const list = SpreadsheetApp.openById(ID_TABULKY).getSheetByName(LISTY[druh]);
   if (!list) throw new Error('V tabulce chybí list „' + LISTY[druh] + '“.');
 
   const posledni = list.getLastColumn();
