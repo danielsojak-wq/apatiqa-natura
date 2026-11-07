@@ -84,7 +84,7 @@ h1, h2, h3 {
 .kicker {
   margin: 0;
   font-family: var(--mono);
-  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--mesicek-svetly);
 }
 .kicker--tmavy { color: var(--hlina); }
@@ -153,7 +153,7 @@ h1, h2, h3 {
   -webkit-text-stroke: .35px currentColor;
 }
 .znacka__sub {
-  font-family: var(--serif); font-size: 11px; font-weight: 500;
+  font-family: var(--serif); font-size: 12px; font-weight: 500;
   letter-spacing: .45em; text-transform: uppercase;
   padding-left: .45em;      /* vyrovná prostrkání vpravo */
 }
@@ -161,7 +161,7 @@ h1, h2, h3 {
 .lista__menu { display: none; margin: 0; padding: 0; list-style: none; gap: 32px; }
 .lista__menu a {
   color: var(--krem); text-decoration: none;
-  font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
   opacity: .8; transition: opacity .2s;
 }
 .lista__menu a:hover { opacity: 1; }
@@ -170,7 +170,7 @@ h1, h2, h3 {
   display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px;
   border: 1px solid rgba(245, 238, 224, .35); border-radius: 999px;
   color: var(--krem); text-decoration: none; white-space: nowrap;
-  font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
+  font-family: var(--mono); font-size: 13px; letter-spacing: .04em;
   transition: border-color .2s, background-color .2s;
 }
 .lista__tel:hover { border-color: var(--mesicek-svetly); background: rgba(245, 238, 224, .06); }
@@ -264,7 +264,7 @@ h1, h2, h3 {
 .arch__hlava {
   margin: 0; padding: 2px 3px 8px; border-bottom: 1px solid rgba(138, 106, 91, .28);
   display: flex; justify-content: space-between; gap: 8px;
-  font-family: var(--mono); font-size: 9px; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10.5px; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase;
   color: var(--hlina);
 }
 
@@ -302,13 +302,13 @@ h1, h2, h3 {
   border: 1px solid rgba(90, 99, 80, .16); pointer-events: none;
 }
 .arch__stitek em {
-  font-family: var(--serif); font-style: italic; font-size: clamp(13px, 3.3vw, 16.5px); line-height: 1.12;
+  font-family: var(--serif); font-style: italic; font-size: clamp(14px, 3.4vw, 17px); line-height: 1.12;
 }
 .arch__stitek em small { font-style: normal; font-size: .72em; color: var(--text-2); }
-.arch__cesky { font-family: var(--serif); font-size: clamp(11px, 2.7vw, 13px); line-height: 1.25; }
+.arch__cesky { font-family: var(--serif); font-size: clamp(12px, 2.9vw, 14px); line-height: 1.25; }
 .arch__celed {
   margin-top: 2px;
-  font-family: var(--mono); font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2);
+  font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2);
 }
 
 .pecet {
@@ -318,7 +318,7 @@ h1, h2, h3 {
 }
 .pecet text {
   fill: currentColor;
-  font-family: var(--mono); font-size: 9.6px; letter-spacing: .08em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10.2px; letter-spacing: .08em; text-transform: uppercase;
 }
 .pecet__kruh {
   transform-box: view-box; transform-origin: 50% 50%;
@@ -343,7 +343,7 @@ h1, h2, h3 {
   font-family: var(--serif); font-size: clamp(15px, .85rem + .45vw, 20px); font-weight: 400;
 }
 .pas__skupina span::after { content: '✦'; margin: 0 22px 0 14px; font-size: .6em; color: var(--mesicek); align-self: center; }
-.pas__skupina i { font-size: .62em; color: var(--text-2); }
+.pas__skupina i { font-size: .72em; color: var(--text-2); }
 
 @keyframes posun { to { transform: translateX(-50%); } }
 
@@ -412,7 +412,7 @@ h1, h2, h3 {
 }
 .foto img { display: block; mix-blend-mode: multiply; }
 .foto figcaption {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2);
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2);
   text-align: center; max-width: 24ch;
 }
 .foto--lahev { transform: rotate(-3deg); }
@@ -437,7 +437,7 @@ h1, h2, h3 {
   flex: none; width: 26px; height: 26px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--mesicek); color: var(--hlina);
-  font-family: var(--mono); font-size: 12px;
+  font-family: var(--mono); font-size: 13px;
 }
 
 .katalog { display: flex; flex-direction: column; gap: 36px; }
@@ -491,13 +491,13 @@ h1, h2, h3 {
   margin: 0;
   font-family: var(--serif); font-size: 21px; font-weight: 450; line-height: 1.2;
 }
-.polozka__popis { margin: 6px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--text-2); max-width: 54ch; }
+.polozka__popis { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--text-2); max-width: 54ch; }
 
 .varianty { flex: 1 1 300px; display: flex; flex-wrap: wrap; gap: 14px 24px; justify-content: flex-end; }
 .varianta { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .varianta__label {
   margin: 0;
-  font-family: var(--mono); font-size: 12.5px; letter-spacing: .03em; color: var(--text-2);
+  font-family: var(--mono); font-size: 13.5px; letter-spacing: .03em; color: var(--text-2);
 }
 .varianta__cena { color: var(--inkoust); font-weight: 500; }
 
@@ -544,7 +544,7 @@ h1, h2, h3 {
 .souhrn::before {
   content: 'Souhrn'; display: block; margin-bottom: 16px; padding-bottom: 12px;
   border-bottom: 1px dashed var(--linka-silna);
-  font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--hlina);
+  font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--hlina);
 }
 .souhrn__prazdno { margin: 0; font-size: 15px; color: var(--text-2); }
 .souhrn__radek {
@@ -576,7 +576,7 @@ h1, h2, h3 {
 .field { display: flex; flex-direction: column; gap: 7px; margin: 0; padding: 0; border: none; min-width: 0; }
 .field label, .field legend {
   padding: 0;
-  font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
   color: var(--text-2);
 }
 .field legend { margin-bottom: 7px; }
@@ -629,7 +629,7 @@ h1, h2, h3 {
 /* Adresa jen při zaslání poštou */
 .form:has(#p-osobne:checked) .field:has(#adresa) { display: none; }
 
-.gdpr { margin: 0; font-size: 13px; color: var(--text-2); }
+.gdpr { margin: 0; font-size: 14px; color: var(--text-2); }
 
 /* ---------- ROZCESTNÍK KATEGORIÍ ---------- */
 
@@ -688,7 +688,7 @@ h1, h2, h3 {
 }
 .kosik__text { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; font-size: 15px; line-height: 1.3; white-space: nowrap; }
 .kosik__popisek {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--mesicek-svetly);
 }
 .kosik__text strong { font-weight: 600; }
@@ -707,7 +707,7 @@ h1, h2, h3 {
 .znacka--velka .znacka__sub { font-size: clamp(13px, 1.4vw, 17px); }
 .paticka__kontakt { display: flex; flex-direction: column; gap: 6px; }
 .paticka__label {
-  margin: 0; font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  margin: 0; font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--mesicek-svetly);
 }
 .paticka__tel { margin: 0; font-family: var(--serif); font-size: clamp(28px, 1.2rem + 1.8vw, 40px); font-weight: 400; }

@@ -304,6 +304,22 @@ na webu z nich je jedna karta s více cenami.
 | **Pořadí** | menší číslo = výš na stránce. Čísluje se po 10 (10, 20, 30 …), aby šlo něco vložit mezi, např. 15. Pořadí sekcí určuje nejmenší číslo v sekci |
 | **Ks z dávky** | kolik kusů vyjde z jedné várky. Na webu se nezobrazuje, počítá s ním list K výrobě |
 
+**Ikony, které na webu jsou** (do sloupce Ikona se píše přesně takhle):
+
+- byliny: `mesickova.png`, `hermankova.png`, `levandulova.png`, `repikova.png`,
+  `rozmarynova.png`, `tymianova.png`, `rebrickova.png`, `koprivova.png`,
+  `trezalkova.png`, `kostivalova.png`, `kastanova.png`, `preslicka.png`,
+  `babci.png` (rostlina, ze které je bakuchiol)
+- suroviny: `kakao.png`, `argan.png`, `pomeranc.png`, `kava-skorice.png`
+- obecné motivy: `lucni-kviti.png`, `kapka-oleje.png`, `kapky-na-listu.png`,
+  `zelena-snitka.png`, `svazek-bylin.png`
+
+Obecné motivy jsou u produktů, u kterých název neříká hlavní surovinu
+(sérum, odličovací olej, lesk na rty, deodorant, repelent). Kdyby měly
+mít bylinu, ze které jsou, přepiš Ikonu na tu bylinu, nebo si nech
+nakreslit novou (Daniel). Větší verze tří bylin pro herbářové archy
+nahoře na stránce jsou v `assets/herbar/`.
+
 ### Běžné úkony
 
 - **Změna ceny:** přepiš číslo ve sloupci Cena. Dřívějších objednávek se to

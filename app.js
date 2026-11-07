@@ -101,6 +101,9 @@ function vykresliChybuKatalogu() {
 /* ----------------------------------------------------------------- */
 
 const mnozstvi = {};          // { idVarianty: počet }
+
+// Částka česky: tisíce oddělené nezlomitelnou mezerou a „Kč“ se neodtrhne — 1 180 Kč
+const kc = (n) => Number(n).toLocaleString('cs-CZ', { maximumFractionDigits: 2 }).replace(/\s/g, '\u00a0') + '\u00a0Kč';
 const nacteno = Date.now();   // časová past proti robotům
 
 const el = (tag, cls, text) => {
@@ -156,7 +159,7 @@ function stepper(polozka, v) {
 
   const popisek = el('p', 'varianta__label');
   popisek.append(document.createTextNode(v.label + ' · '));
-  popisek.append(el('span', 'varianta__cena', v.cena + ' Kč'));
+  popisek.append(el('span', 'varianta__cena', kc(v.cena)));
   box.append(popisek);
 
   const ovladac = el('div', 'stepper');
@@ -212,14 +215,14 @@ function vykresliSouhrn() {
   polozky.forEach((p) => {
     const radek = el('div', 'souhrn__radek');
     radek.append(el('p', null, p.nazev + ' · ' + p.varianta));
-    radek.append(el('p', null, p.pocet + '×  ' + p.celkem + ' Kč'));
+    radek.append(el('p', null, p.pocet + '×  ' + kc(p.celkem)));
     cil.append(radek);
   });
 
   const celkem = polozky.reduce((s, p) => s + p.celkem, 0);
   const paticka = el('div', 'souhrn__celkem');
   paticka.append(el('p', 'popisek', 'Celkem'));
-  paticka.append(el('p', 'castka', celkem + ' Kč'));
+  paticka.append(el('p', 'castka', kc(celkem)));
   cil.append(paticka);
 
   document.getElementById('odeslat').disabled = false;
@@ -248,7 +251,7 @@ function vykresliPrehled(polozky) {
   const kosik = document.getElementById('kosik');
   if (kosik) {
     document.getElementById('kosik-pocet').textContent = kusu + ' ' + slovoKus(kusu);
-    document.getElementById('kosik-celkem').textContent = celkem + ' Kč';
+    document.getElementById('kosik-celkem').textContent = kc(celkem);
     const videt = kusu > 0 && naObrazovce.size === 0;
     kosik.classList.toggle('je-videt', videt);
     kosik.setAttribute('aria-hidden', String(!videt));
@@ -262,7 +265,7 @@ function vykresliPrehled(polozky) {
     o.pocet.hidden = !n;
   });
 
-  document.getElementById('odeslat').textContent = kusu ? 'Odeslat objednávku · ' + celkem + ' Kč' : 'Odeslat objednávku';
+  document.getElementById('odeslat').textContent = kusu ? 'Odeslat objednávku · ' + kc(celkem) : 'Odeslat objednávku';
 }
 
 /* Rozcestník kategorií nad ceníkem; zvýrazní kategorii, kterou máte před sebou. */
