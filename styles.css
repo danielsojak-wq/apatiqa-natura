@@ -26,19 +26,18 @@
   --linka: #DDD2BC;
   --linka-silna: #C6B99D;
 
-  /* ZNAČKOVÁ BARVA — lesní přechod: tmavá zeleň, teplé světlo měsíčku
-     vpravo, šalvěj vlevo dole. Používá se jako celé pozadí (background),
-     ne jako barva textu. Dvě podoby stejné kompozice:
+  /* ZNAČKOVÁ BARVA — lesní přechod: tmavá zeleň, která se z jedné
+     strany (vlevo dole) rozjasňuje do šalvěje. Používá se jako celé
+     pozadí (background), ne jako barva textu. Dvě podoby:
        --lesni-prechod      velké plochy (hero, patička) — světlo v %
        --lesni-prechod-pas  pásy a lišty (košík, Celkem, aktivní kategorie)
                             — světlo v pevné velikosti, aby se v úzkém
-                            prvku neroztáhlo do šmouhy */
+                            prvku neroztáhlo do šmouhy
+     Hero k tomu má navíc teplé světlo měsíčku za herbářovými archy. */
   --lesni-prechod:
-    radial-gradient(55% 50% at 78% 52%, rgba(227, 154, 53, .22), transparent 70%),
     radial-gradient(45% 55% at 0% 100%, rgba(110, 127, 79, .45), transparent 70%),
     var(--les);
   --lesni-prechod-pas:
-    radial-gradient(170px 110px at 82% 50%, rgba(227, 154, 53, .2), transparent 72%),
     radial-gradient(240px 140px at 0% 100%, rgba(110, 127, 79, .5), transparent 72%),
     var(--les);
 
@@ -125,7 +124,9 @@ h1, h2, h3 {
   position: relative; isolation: isolate; overflow: hidden;
   padding: 0 var(--okraj) clamp(48px, 7vw, 96px);
   color: var(--krem);
-  background: var(--lesni-prechod);
+  background:
+    radial-gradient(55% 50% at 78% 52%, rgba(227, 154, 53, .22), transparent 70%),  /* světlo za archy */
+    var(--lesni-prechod);
 }
 .hero::before {           /* zrno papíru */
   content: ''; position: absolute; inset: 0; z-index: -1;
