@@ -175,20 +175,22 @@ function stepper(polozka, v) {
   pridat.type = 'button';
   pridat.setAttribute('aria-label', 'Přidat ' + polozka.nazev + ' ' + v.label);
 
-  const zmen = (o) => {
-    const n = Math.max(0, Math.min(20, (mnozstvi[v.id] || 0) + o));
-    mnozstvi[v.id] = n;
-    pocet.textContent = String(n);
-    pocet.classList.toggle('ma-hodnotu', n > 0);
-    vykresliSouhrn();
-  };
-
-  ubrat.addEventListener('click', () => zmen(-1));
-  pridat.addEventListener('click', () => zmen(1));
+  ubrat.addEventListener('click', () => nastavMnozstvi(v.id, (mnozstvi[v.id] || 0) - 1));
+  pridat.addEventListener('click', () => nastavMnozstvi(v.id, (mnozstvi[v.id] || 0) + 1));
 
   ovladac.append(ubrat, pocet, pridat);
   box.append(ovladac);
   return box;
+}
+
+/* Jediné místo, kde se mění množství — volá ho ceník i souhrn,
+   takže stepper v ceníku, souhrn, košík i tlačítko vždy sedí. */
+function nastavMnozstvi(id, n) {
+  n = Math.max(0, Math.min(20, n));
+  mnozstvi[id] = n;
+  const o = document.getElementById('out-' + id);
+  if (o) { o.textContent = String(n); o.classList.toggle('ma-hodnotu', n > 0); }
+  vykresliSouhrn();
 }
 
 function vybrane() {
@@ -203,6 +205,13 @@ function vybrane() {
 function vykresliSouhrn() {
   const cil = document.getElementById('souhrn');
   const polozky = vybrane();
+
+  // Souhrn se kreslí znovu po každé změně; fokus z tlačítek − / + v něm
+  // přeneseme na nově vykreslené tlačítko, ať jde klikat dál i z klávesnice.
+  const aktivni = document.activeElement;
+  const fokus = aktivni && cil.contains(aktivni) && aktivni.dataset.akce
+    ? { id: aktivni.dataset.id, akce: aktivni.dataset.akce } : null;
+
   cil.textContent = '';
   vykresliPrehled(polozky);
 
@@ -214,8 +223,31 @@ function vykresliSouhrn() {
 
   polozky.forEach((p) => {
     const radek = el('div', 'souhrn__radek');
-    radek.append(el('p', null, p.nazev + ' · ' + p.varianta));
-    radek.append(el('p', null, p.pocet + '×  ' + kc(p.celkem)));
+
+    const popis = el('div', 'souhrn__popis');
+    popis.append(el('p', 'souhrn__nazev', p.nazev + ' · ' + p.varianta));
+    popis.append(el('p', 'souhrn__ks', kc(p.cena) + ' / ks'));
+    radek.append(popis);
+
+    const ovladac = el('div', 'stepper stepper--maly');
+    const ubrat = el('button', null, '−');
+    ubrat.type = 'button';
+    ubrat.dataset.akce = 'ubrat';
+    ubrat.dataset.id = p.id;
+    ubrat.setAttribute('aria-label', 'O kus méně: ' + p.nazev + ' ' + p.varianta);
+    ubrat.addEventListener('click', () => nastavMnozstvi(p.id, p.pocet - 1));
+    const pocet = el('output', 'ma-hodnotu', String(p.pocet));
+    const pridat = el('button', null, '+');
+    pridat.type = 'button';
+    pridat.dataset.akce = 'pridat';
+    pridat.dataset.id = p.id;
+    pridat.setAttribute('aria-label', 'O kus víc: ' + p.nazev + ' ' + p.varianta);
+    pridat.disabled = p.pocet >= 20;
+    pridat.addEventListener('click', () => nastavMnozstvi(p.id, p.pocet + 1));
+    ovladac.append(ubrat, pocet, pridat);
+    radek.append(ovladac);
+
+    radek.append(el('p', 'souhrn__castka', kc(p.celkem)));
     cil.append(radek);
   });
 
@@ -226,6 +258,12 @@ function vykresliSouhrn() {
   cil.append(paticka);
 
   document.getElementById('odeslat').disabled = false;
+
+  if (fokus) {
+    const tlacitko = cil.querySelector('button[data-id="' + fokus.id + '"][data-akce="' + fokus.akce + '"]')
+      || cil.querySelector('button[data-akce]');
+    if (tlacitko) tlacitko.focus();
+  }
 }
 
 /* -----------------------------------------------------------------
