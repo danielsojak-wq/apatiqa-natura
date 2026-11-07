@@ -333,15 +333,15 @@ h1, h2, h3 {
   background: var(--krem-2);
   border-bottom: 1px solid var(--linka);
 }
-.pas__stopa { display: flex; width: max-content; animation: posun 70s linear infinite; }
+.pas__stopa { display: flex; width: max-content; animation: posun 110s linear infinite; }
 .pas__skupina { display: flex; }
 .pas__skupina span {
-  display: inline-flex; align-items: baseline; gap: 10px;
-  padding: 16px 0; white-space: nowrap;
-  font-family: var(--serif); font-size: clamp(20px, 1rem + 1.4vw, 30px); font-weight: 400;
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 11px 0; white-space: nowrap;
+  font-family: var(--serif); font-size: clamp(15px, .85rem + .45vw, 20px); font-weight: 400;
 }
-.pas__skupina span::after { content: '✦'; margin: 0 28px 0 18px; font-size: .55em; color: var(--mesicek); align-self: center; }
-.pas__skupina i { font-size: .52em; color: var(--text-2); }
+.pas__skupina span::after { content: '✦'; margin: 0 22px 0 14px; font-size: .6em; color: var(--mesicek); align-self: center; }
+.pas__skupina i { font-size: .62em; color: var(--text-2); }
 
 @keyframes posun { to { transform: translateX(-50%); } }
 
