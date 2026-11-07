@@ -346,17 +346,12 @@ h1, h2, h3 {
 @keyframes posun { to { transform: translateX(-50%); } }
 
 /* ---------- ZÁSADY ----------
-   Tmavý pás ve značkové zelené: ikona v tenkém kroužku + krátký text,
+   Tmavý pás v čisté značkové zeleni: ikona v tenkém kroužku + krátký text,
    oddělené jemnými linkami. Bez animací. */
 
 .zasady {
-  position: relative; isolation: isolate;
   padding: clamp(28px, 4vw, 48px) var(--okraj);
-  background: var(--lesni-prechod-pas); color: var(--krem);
-}
-.zasady::before {
-  content: ''; position: absolute; inset: 0; z-index: -1;
-  background-image: var(--zrno); opacity: .08; pointer-events: none;
+  background: var(--les); color: var(--krem);   /* čistá značková zeleň, bez přechodu */
 }
 
 .zasady__seznam {
