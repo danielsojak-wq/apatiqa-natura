@@ -10,7 +10,7 @@
    ----------------------------------------------------------------- */
 
 :root {
-  --les: #1C2F20;          /* hero, patička */
+  --les: #1C2F20;          /* základ lesního přechodu, theme-color */
   --les-2: #26402B;
   --zelena: #3C5330;       /* značková zeleň, tlačítka */
   --salvej: #6E7F4F;
@@ -25,6 +25,22 @@
   --text-2: #5A6350;       /* vedlejší text */
   --linka: #DDD2BC;
   --linka-silna: #C6B99D;
+
+  /* ZNAČKOVÁ BARVA — lesní přechod: tmavá zeleň, teplé světlo měsíčku
+     vpravo, šalvěj vlevo dole. Používá se jako celé pozadí (background),
+     ne jako barva textu. Dvě podoby stejné kompozice:
+       --lesni-prechod      velké plochy (hero, patička) — světlo v %
+       --lesni-prechod-pas  pásy a lišty (košík, Celkem, aktivní kategorie)
+                            — světlo v pevné velikosti, aby se v úzkém
+                            prvku neroztáhlo do šmouhy */
+  --lesni-prechod:
+    radial-gradient(55% 50% at 78% 52%, rgba(227, 154, 53, .22), transparent 70%),
+    radial-gradient(45% 55% at 0% 100%, rgba(110, 127, 79, .45), transparent 70%),
+    var(--les);
+  --lesni-prechod-pas:
+    radial-gradient(170px 110px at 82% 50%, rgba(227, 154, 53, .2), transparent 72%),
+    radial-gradient(240px 140px at 0% 100%, rgba(110, 127, 79, .5), transparent 72%),
+    var(--les);
 
   --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
   --sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -109,10 +125,7 @@ h1, h2, h3 {
   position: relative; isolation: isolate; overflow: hidden;
   padding: 0 var(--okraj) clamp(48px, 7vw, 96px);
   color: var(--krem);
-  background:
-    radial-gradient(55% 50% at 78% 52%, rgba(227, 154, 53, .22), transparent 70%),
-    radial-gradient(45% 55% at 0% 100%, rgba(110, 127, 79, .45), transparent 70%),
-    var(--les);
+  background: var(--lesni-prechod);
 }
 .hero::before {           /* zrno papíru */
   content: ''; position: absolute; inset: 0; z-index: -1;
@@ -502,10 +515,11 @@ h1, h2, h3 {
 .objednavka .section-head { margin-bottom: 0; }
 
 .souhrn {
-  align-self: start;
+  --pad: clamp(20px, 3vw, 30px);
+  align-self: start; overflow: hidden;
   background: var(--papir);
   border: 1px solid var(--linka); border-radius: 6px;
-  padding: 26px clamp(20px, 3vw, 30px) 24px;
+  padding: 26px var(--pad) 24px;
   box-shadow: 0 24px 40px -30px rgba(30, 42, 27, .45);
 }
 .souhrn::before {
@@ -520,10 +534,21 @@ h1, h2, h3 {
 }
 .souhrn__radek p { margin: 0; font-size: 15px; }
 .souhrn__radek p:last-child { flex: none; font-family: var(--mono); font-size: 14px; white-space: pre; }
-.souhrn__celkem { display: flex; justify-content: space-between; align-items: baseline; padding-top: 8px; }
+.souhrn__radek:has(+ .souhrn__celkem) { border-bottom: none; }
+/* pás Celkem v barvě značky, přes celou šířku účtenky */
+.souhrn__celkem {
+  position: relative; isolation: isolate;
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin: 14px calc(-1 * var(--pad)) -24px; padding: 18px var(--pad) 20px;
+  background: var(--lesni-prechod-pas); color: var(--krem);
+}
+.souhrn__celkem::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background-image: var(--zrno); opacity: .08; pointer-events: none;
+}
 .souhrn__celkem p { margin: 0; font-family: var(--serif); }
 .souhrn__celkem .popisek { font-size: 22px; font-style: italic; }
-.souhrn__celkem .castka { font-size: 30px; font-weight: 500; color: var(--zelena); }
+.souhrn__celkem .castka { font-size: 30px; font-weight: 500; color: var(--mesicek-svetly); }
 
 .form { display: flex; flex-direction: column; gap: 20px; }
 .form__row { display: flex; flex-wrap: wrap; gap: 20px; }
@@ -604,7 +629,7 @@ h1, h2, h3 {
   transition: background-color .2s, color .2s;
 }
 .rozcestnik__odkaz:hover { background: rgba(60, 83, 48, .08); }
-.rozcestnik__odkaz.je-aktivni { background: var(--zelena); color: var(--krem); }
+.rozcestnik__odkaz.je-aktivni { background: var(--lesni-prechod-pas); color: var(--krem); }
 
 .rozcestnik__pocet {
   min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
@@ -621,7 +646,8 @@ h1, h2, h3 {
   width: min(560px, calc(100% - 24px));
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   padding: 9px 9px 9px 22px;
-  background: var(--les); color: var(--krem);
+  isolation: isolate;
+  background: var(--lesni-prechod-pas); color: var(--krem);
   border-radius: 999px;
   box-shadow: 0 22px 44px -14px rgba(5, 15, 7, .6), 0 0 0 1px rgba(245, 238, 224, .08) inset;
   transform: translate(-50%, calc(100% + 40px)); visibility: hidden;
@@ -630,6 +656,10 @@ h1, h2, h3 {
 .kosik.je-videt {
   transform: translate(-50%, 0); visibility: visible;
   transition: transform .45s cubic-bezier(.2, .75, .2, 1), visibility 0s;
+}
+.kosik::before {          /* zrno jako v hero */
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background-image: var(--zrno); opacity: .09; pointer-events: none;
 }
 .kosik__text { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; font-size: 15px; line-height: 1.3; white-space: nowrap; }
 .kosik__popisek {
@@ -644,7 +674,7 @@ h1, h2, h3 {
 .paticka {
   position: relative; isolation: isolate; overflow: hidden;
   padding: clamp(56px, 7vw, 88px) var(--okraj) 40px;
-  background: var(--les); color: #EFE7D4;
+  background: var(--lesni-prechod); color: #EFE7D4;
 }
 .paticka::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: var(--zrno); opacity: .08; }
 .paticka__top { display: flex; flex-wrap: wrap; gap: 36px; align-items: flex-end; justify-content: space-between; }
