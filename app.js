@@ -6,81 +6,97 @@ const ENDPOINT = '';
 
 /* -----------------------------------------------------------------
    DATA
-   Zatím napevno. Cílový stav: načíst z Google Sheetu (list "Ceník")
-   přes doGet na ENDPOINT, aby mamka mohla ceny a produkty editovat
-   sama. Struktura jedné varianty musí zůstat { id, label, price }.
+   Ceník se načítá při otevření stránky z Google Sheetu (list "Ceník")
+   přes doGet na ENDPOINT — mamka ceny a produkty edituje v tabulce.
+   Struktura jedné varianty musí zůstat { id, label, cena }; stojí na
+   ní výběr množství i souhrn.
    ----------------------------------------------------------------- */
 
-const MASTI = [
-  ['mesickova',  'Měsíčková',   'Hojí rány a popraskaniny, péče o citlivou a podrážděnou pokožku, zklidňuje záněty, podporuje regeneraci.'],
-  ['hermankova', 'Heřmánková',  'Má protizánětlivé, antiseptické a regenerační účinky.'],
-  ['levandulova','Levandulová', 'Má zklidňující a regenerační účinky, podpora hojení drobných ran.'],
-  ['repikova',   'Řepíková',    'Má silné protizánětlivé, regenerační a stahující účinky, úleva od potíží s hemoroidy.'],
-  ['rozmarynova','Rozmarýnová', 'Působí příznivě na pohybový aparát – bolesti kloubů, svalů, zad a šlach, při revmatismu, artritidě, při bolestech hlavy či migréně, při respiračních potížích.'],
-  ['tymianova',  'Tymiánová',   'Podporuje normální stav dýchacích cest, harmonii a klidný spánek. Vhodná při nachlazení.'],
-  ['rebrickova', 'Řebříčková',  'Podporuje přirozenou regeneraci pokožky, chrání, zklidňuje a vyživuje suchou pokožku, působí příznivě na rozpraskané paty a na péči o anální oblast.'],
-  ['koprivova',  'Kopřivová',   'Podporuje zdraví pokožky, kloubů a svalů. Pomáhá při revmatismu, ztuhlosti a bolesti kloubů i zad, protizánětlivě, zjemňuje.'],
-  ['trezalkova', 'Třezalková',  'Pomáhá při drobných popáleninách (i od slunce), ekzémech, ulevuje při ztuhlých svalech, bolestech zad.'],
-  ['kostivalova','Kostivalová', 'Pro podporu zdraví pohybové soustavy – klouby, kosti, svaly, šlachy, meziobratlové ploténky, při zlomeninách, výronech, vstřebávání podlitin a modřin.']
-];
+let KATALOG = [];   // [{ nazev, barva, polozky: [{ nazev, popis, ikona, varianty: [{ id, label, cena }] }] }]
 
-const SAMPUKY = ['Heřmánkový', 'Kopřivový', 'Levandulový', 'Měsíčkový', 'Čokoládový', 'Přesličkový'];
+// Barvy hlaviček kategorií z návrhu. Nová kategorie dostane barvu podle pořadí.
+const BARVY_KATEGORII = {
+  'Masti a balzámy': '#3C5330',
+  'Péče o vlasy':    '#55683D',
+  'Péče o pleť':     '#6E7F4F',
+  'Péče o tělo':     '#8A6A5B'
+};
+const BARVY_DALSI = ['#3C5330', '#55683D', '#6E7F4F', '#8A6A5B'];
 
-function masti() {
-  const out = MASTI.map(([slug, nazev, popis]) => ({
-    nazev: nazev + ' mast / balzám',
-    popis,
-    ikona: 'assets/' + slug + '.png',
-    varianty: [
-      { id: slug + '-30', label: '30 ml', cena: 130 },
-      { id: slug + '-50', label: '50 ml', cena: 200 }
-    ]
-  }));
-  out.push({
-    nazev: 'Kaštanová mast / gel / balzám',
-    popis: 'Žíly a cévní potíže, hemoroidy, otoky, těžké nohy, křečové žíly, pohmožděniny, podlitiny.',
-    ikona: 'assets/kastanova.png',
-    varianty: [
-      { id: 'kastanova-30', label: '30 ml', cena: 135 },
-      { id: 'kastanova-50', label: '50 ml', cena: 200 }
-    ]
-  });
-  return out;
+const LIMIT_NACTENI = 15000;   // ms; pak se místo ceníku ukáže telefon
+
+/* Řádky z doGet → KATALOG. Jeden řádek = jedna varianta; řádky se
+   stejnou kategorií a produktem se spojí do jedné položky.          */
+function sestavKatalog(produkty) {
+  const kategorie = [];
+  const podleKategorie = new Map();
+  const podleProduktu = new Map();
+  const poradi = (r) => (typeof r.poradi === 'number' ? r.poradi : Infinity);
+
+  produkty
+    .filter((r) => r && r.aktivni !== false && r.id && r.produkt && Number(r.cena) > 0)
+    .sort((a, b) => poradi(a) - poradi(b))
+    .forEach((r) => {
+      const nazevKat = r.kategorie || 'Ostatní';
+      let kat = podleKategorie.get(nazevKat);
+      if (!kat) {
+        kat = {
+          nazev: nazevKat,
+          barva: BARVY_KATEGORII[nazevKat] || BARVY_DALSI[kategorie.length % BARVY_DALSI.length],
+          polozky: []
+        };
+        podleKategorie.set(nazevKat, kat);
+        kategorie.push(kat);
+      }
+
+      const klic = nazevKat + '|' + r.produkt;
+      let polozka = podleProduktu.get(klic);
+      if (!polozka) {
+        const ikona = r.ikona ? String(r.ikona) : '';
+        polozka = {
+          nazev: r.produkt,
+          popis: r.popis || '',
+          ikona: ikona && !ikona.includes('/') ? 'assets/' + ikona : ikona,
+          varianty: []
+        };
+        podleProduktu.set(klic, polozka);
+        kat.polozky.push(polozka);
+      }
+
+      polozka.varianty.push({ id: r.id, label: r.varianta || '', cena: Number(r.cena) });
+    });
+
+  return kategorie;
 }
 
-function vlasy() {
-  const out = SAMPUKY.map((n, i) => ({
-    nazev: n + ' šampuk',
-    popis: i === 0 ? 'Pevný šampon s drceným heřmánkem.' : '',
-    ikona: '',
-    varianty: [{ id: 'sampuk-' + i, label: '50 g', cena: 145 }]
-  }));
-  out.push({
-    nazev: 'Tuhý kondicionér s arganovým olejem',
-    popis: 'Vyživuje, usnadňuje rozčesávání a zanechává vlasy hebké a lesklé.',
-    ikona: '',
-    varianty: [{ id: 'kondicioner-30', label: '30 g', cena: 85 }]
-  });
-  return out;
+async function nactiKatalog() {
+  if (!ENDPOINT) throw new Error('ENDPOINT v app.js není vyplněný.');
+
+  const preruseni = new AbortController();
+  const casovac = setTimeout(() => preruseni.abort(), LIMIT_NACTENI);
+  try {
+    // Obyčejné GET bez vlastních hlaviček — žádný CORS preflight.
+    const odpoved = await fetch(ENDPOINT, { signal: preruseni.signal });
+    if (!odpoved.ok) throw new Error('HTTP ' + odpoved.status);
+    const data = await odpoved.json();
+    if (!data || !Array.isArray(data.produkty)) throw new Error((data && data.chyba) || 'Neplatná odpověď.');
+    const katalog = sestavKatalog(data.produkty);
+    if (!katalog.length) throw new Error('V ceníku není nic aktivního.');
+    return katalog;
+  } finally {
+    clearTimeout(casovac);
+  }
 }
 
-const KATALOG = [
-  { nazev: 'Masti a balzámy', barva: '#3C5330', polozky: masti() },
-  { nazev: 'Péče o vlasy',    barva: '#55683D', polozky: vlasy() },
-  { nazev: 'Péče o pleť',     barva: '#6E7F4F', polozky: [
-    { nazev: 'Hydratační květové sérum', popis: 'Sjednocuje tón pleti, snižuje zarudnutí, potlačuje fliky, reguluje ztrátu pevnosti pleti.', ikona: '', varianty: [{ id: 'serum-30', label: '30 ml', cena: 185 }] },
-    { nazev: 'Pleťový krém s bakuchiolem', popis: 'Podporuje obnovu pleti, zlepšuje její texturu, vyhlazuje jemné vrásky a sjednocuje tón pleti.', ikona: '', varianty: [{ id: 'krem-30', label: '30 ml', cena: 249 }] },
-    { nazev: 'Odličovací olej', popis: 'Šetrně odstraňuje make-up i nečistoty, přitom pleť vyživuje a zanechává hebkou.', ikona: '', varianty: [{ id: 'odlic-10', label: '10 ml', cena: 69 }] },
-    { nazev: 'Pomerančový balzám na rty', popis: 'Vyživuje, zklidňuje a chrání rty, zanechává je hebké a jemně vonící.', ikona: '', varianty: [{ id: 'balzam-rty-15', label: '15 ml', cena: 89 }] },
-    { nazev: 'Lesk na rty s pečujícími oleji', popis: 'Vyživuje, zklidňuje a chrání rty, zanechává je hebké a jemně lesklé.', ikona: '', varianty: [{ id: 'lesk-rty-10', label: '10 ml', cena: 119 }] }
-  ]},
-  { nazev: 'Péče o tělo',     barva: '#8A6A5B', polozky: [
-    { nazev: 'Třezalkový olej', popis: 'Na popáleniny, po slunění, na bolesti svalů a pro přirozenou regeneraci pokožky.', ikona: '', varianty: [{ id: 'trezalka-50', label: '50 ml', cena: 75 }] },
-    { nazev: 'Peelingové mýdlo kávové se skořicí', popis: 'S kávovými zrníčky.', ikona: '', varianty: [{ id: 'peeling-70', label: '70 g', cena: 95 }] },
-    { nazev: 'Přírodní tuhý deodorant', popis: 'Ve vysouvací tyčince.', ikona: '', varianty: [{ id: 'deo-15', label: '15 ml', cena: 89 }] },
-    { nazev: 'Přírodní repelent', popis: 'Nastříkat na pokožku, nebo na oblečení.', ikona: '', varianty: [{ id: 'repelent-50', label: '50 ml', cena: 230 }] }
-  ]}
-];
+function vykresliChybuKatalogu() {
+  const cil = document.getElementById('katalog');
+  cil.textContent = '';
+  const zprava = el('p', 'katalog__loading', 'Ceník se teď nepodařilo načíst. Objednat můžete telefonicky na ');
+  const tel = el('a', null, '+420 776 349 774');
+  tel.href = 'tel:+420776349774';
+  zprava.append(tel, '.');
+  cil.append(zprava);
+}
 
 /* ----------------------------------------------------------------- */
 
@@ -254,6 +270,9 @@ async function odesli(e) {
   try {
     const odpoved = await fetch(ENDPOINT, { method: 'POST', body: data });
     if (!odpoved.ok) throw new Error('HTTP ' + odpoved.status);
+    // Apps Script vrací HTTP 200 i při chybě — o zápisu rozhoduje až "ok".
+    const vysledek = await odpoved.json();
+    if (!vysledek || vysledek.ok !== true) throw new Error((vysledek && vysledek.chyba) || 'Objednávka se nezapsala.');
     hotovo(stav, form);
   } catch (chyba) {
     console.error(chyba);
@@ -275,8 +294,16 @@ function hotovo(stav, form) {
   stav.className = 'stav stav--ok';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  vykresliKatalog();
+document.addEventListener('DOMContentLoaded', async () => {
   vykresliSouhrn();
   document.getElementById('form').addEventListener('submit', odesli);
+
+  // Do konce načítání zůstává v #katalog text „Načítám ceník…“ z index.html.
+  try {
+    KATALOG = await nactiKatalog();
+    vykresliKatalog();
+  } catch (chyba) {
+    console.error('Ceník se nenačetl:', chyba);
+    vykresliChybuKatalogu();
+  }
 });
