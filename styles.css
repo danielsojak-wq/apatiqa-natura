@@ -597,15 +597,21 @@ h1, h2, h3 {
 
 .radios { display: flex; flex-wrap: wrap; gap: 12px; }
 .radios span {
+  position: relative; cursor: pointer;
   display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px 0 16px;
   background: var(--papir); border: 1px solid var(--linka-silna); border-radius: 999px;
   transition: border-color .2s, box-shadow .2s;
 }
+.radios span:hover { border-color: var(--zelena); }
 .radios span:has(input:checked) { border-color: var(--zelena); box-shadow: 0 0 0 1px var(--zelena) inset; }
-.radios input { width: 18px; height: 18px; margin: 0; accent-color: var(--zelena); }
+.radios span:has(input:focus-visible) { outline: 2px solid var(--mesicek); outline-offset: 3px; }
+.radios input { width: 18px; height: 18px; margin: 0; accent-color: var(--zelena); cursor: pointer; }
+.radios input:focus-visible { outline: none; }
 .radios label {
   font-family: var(--sans); font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--inkoust); cursor: pointer;
 }
+/* klikatelné celé tlačítko: popisek se roztáhne přes celou plochu */
+.radios label::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
 
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
