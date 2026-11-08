@@ -2,7 +2,7 @@
    -----------------------------------------------------------------
    TADY SE DOPLŇUJE: adresa nasazeného Apps Script Web Appu.
    Dokud je prázdná, formulář jen ukáže, co by odeslal.             */
-const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwPVkooLDxoUwf3XyQraoWkW0wL5PGEzOTITI6J2Vh5de_T1oxUOXD2PEEVPD-jSzP7/exec';
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbx5Jn3drgWjJ3K6O4gCkygz25WR_BqO3C3zfgNI3KF4dQL64Ej6k1W0Deox_TD4pnQO2Q/exec';
 
 /* -----------------------------------------------------------------
    DATA
