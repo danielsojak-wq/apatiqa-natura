@@ -739,8 +739,24 @@ h1, h2, h3 {
 /* ---------- VĚTŠÍ OBRAZOVKY ---------- */
 
 @media (max-width: 599px) {
+  /* hero na mobilu: bez kickeru, mezery podle hierarchie (nadpis → perex
+     blíž, akce dál), hlavní tlačítko přes celou šířku, archy v okraji */
+  .hero .kicker { display: none; }
+  .hero__obsah { padding-top: 40px; gap: 48px; }
+  .hero__text { gap: 0; }
+  /* pod ~390 px se nadpis zmenší, ať „v malých várkách.“ zůstane na řádku */
+  .hero__nadpis { font-size: min(clamp(3rem, 1.4rem + 5.6vw, 6rem), 12.4vw); line-height: 1.02; }
+  .hero__perex { margin-top: 24px; font-size: 17px; line-height: 1.6; }
+  .hero__akce { flex-direction: column; align-items: stretch; gap: 20px; width: 100%; margin-top: 36px; }
+  .hero__akce .odkaz { align-self: center; }
+  .arch--1 { --x: -48%; }
+  .arch--3 { --x: 48%; }
+  /* méně textu: pečeť opakuje nadpis, hlavička „Herbář Apatiqa“ je na
+     každém archu stejná, čeleď je drobnost. Zůstane kresba a jméno byliny. */
+  .pecet, .arch__hlava, .arch__celed { display: none; }
+  .herbar { height: clamp(320px, 84vw, 380px); }   /* archy bez hlavičky jsou nižší */
+
   .polozka__ikona { width: 52px; height: 62px; }
-  .arch__hlava span + span { display: none; }
   .polozka__info:not(:has(.polozka__ikona))::before { width: 52px; height: 52px; background-size: 22px; }
   .varianty { justify-content: flex-start; }
   .varianta { align-items: flex-start; }
