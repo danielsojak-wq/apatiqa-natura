@@ -25,6 +25,12 @@ const BARVY_DALSI = ['#3C5330', '#55683D', '#6E7F4F', '#8A6A5B'];
 
 const LIMIT_NACTENI = 15000;   // ms; pak se místo ceníku ukáže telefon
 
+/* Náhled na localhostu: dokud je ENDPOINT prázdný, ceník se vezme
+   z ukazka-ceniku.json (stejný tvar jako odpověď doGet). Na ostrém
+   webu se nepoužije nikdy.                                           */
+const UKAZKOVY_CENIK = 'ukazka-ceniku.json';
+const JE_LOCALHOST = ['localhost', '127.0.0.1'].includes(location.hostname);
+
 /* Řádky z doGet → KATALOG. Jeden řádek = jedna varianta; řádky se
    stejnou kategorií a produktem se spojí do jedné položky.          */
 function sestavKatalog(produkty) {
@@ -70,13 +76,15 @@ function sestavKatalog(produkty) {
 }
 
 async function nactiKatalog() {
-  if (!ENDPOINT) throw new Error('ENDPOINT v app.js není vyplněný.');
+  const zdroj = ENDPOINT || (JE_LOCALHOST ? UKAZKOVY_CENIK : '');
+  if (!zdroj) throw new Error('ENDPOINT v app.js není vyplněný.');
+  if (!ENDPOINT) console.warn('ENDPOINT je prázdný, ceník je ukázkový z ' + UKAZKOVY_CENIK + '.');
 
   const preruseni = new AbortController();
   const casovac = setTimeout(() => preruseni.abort(), LIMIT_NACTENI);
   try {
     // Obyčejné GET bez vlastních hlaviček — žádný CORS preflight.
-    const odpoved = await fetch(ENDPOINT, { signal: preruseni.signal });
+    const odpoved = await fetch(zdroj, { signal: preruseni.signal });
     if (!odpoved.ok) throw new Error('HTTP ' + odpoved.status);
     const data = await odpoved.json();
     if (!data || !Array.isArray(data.produkty)) throw new Error((data && data.chyba) || 'Neplatná odpověď.');
