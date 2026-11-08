@@ -148,26 +148,14 @@ obsah listu (hodnoty i vzorce), list samotný nech. Nová hlavička A1:F1:
 |---|---|---|---|---|---|
 | Kategorie | Produkt | Varianta | Kusů k výrobě | Ks z dávky | Dávek uvařit |
 
-Vzorce (každý se rozlije dolů sám, do ostatních buněk nic nepiš):
+Jediný vzorec v A2 vyplní celou tabulku A:F a ukáže jen produkty, které
+je potřeba vyrobit (kusy z objednávek „Ke zpracování“ a „Ve výrobě“,
+v pořadí podle Ceníku). Do ostatních buněk pod hlavičkou nic nepiš.
+Dávek uvařit se spočítá jen u řádků s vyplněným Ks z dávky v Ceníku.
 
-A2 — všechny řádky Ceníku (i neaktivní) seřazené podle Pořadí:
+A2 (zápis pro české nastavení tabulky — středníky, sloupce v poli `\`):
 ```
-=CHOOSECOLS(SORT(FILTER({'Ceník'!A2:C, 'Ceník'!H2:I}, 'Ceník'!B2:B<>""), 4, TRUE), 1, 2, 3)
-```
-
-D2 — kusy z objednávek, které jsou „Ke zpracování“ nebo „Ve výrobě“:
-```
-=MAP(B2:B, C2:C, LAMBDA(p, v, IF(p="", "", SUMIFS('Položky'!F:F, 'Položky'!D:D, p, 'Položky'!E:E, v, 'Položky'!J:J, "Ke zpracování") + SUMIFS('Položky'!F:F, 'Položky'!D:D, p, 'Položky'!E:E, v, 'Položky'!J:J, "Ve výrobě"))))
-```
-
-E2 — Ks z dávky z Ceníku (stejné řazení jako A2):
-```
-=CHOOSECOLS(SORT(FILTER({'Ceník'!A2:C, 'Ceník'!H2:I}, 'Ceník'!B2:B<>""), 4, TRUE), 5)
-```
-
-F2 — kolik várek uvařit:
-```
-=MAP(D2:D, E2:E, LAMBDA(k, d, IF(OR(k="", d=""), "", IFERROR(ROUNDUP(k/d), ""))))
+=LET(cen; SORT(FILTER({'Ceník'!A2:C\ 'Ceník'!I2:I\ 'Ceník'!H2:H}; 'Ceník'!B2:B<>""); 5; TRUE); ks; MAP(CHOOSECOLS(cen; 2); CHOOSECOLS(cen; 3); LAMBDA(p; v; SUMIFS('Položky'!F:F; 'Položky'!D:D; p; 'Položky'!E:E; v; 'Položky'!J:J; "Ke zpracování") + SUMIFS('Položky'!F:F; 'Položky'!D:D; p; 'Položky'!E:E; v; 'Položky'!J:J; "Ve výrobě"))); davka; CHOOSECOLS(cen; 4); varek; MAP(ks; davka; LAMBDA(k; d; IF(d=""; ""; IFERROR(ROUNDUP(k/d); "")))); IFERROR(FILTER(HSTACK(CHOOSECOLS(cen; 1; 2; 3); ks; davka; varek); ks>0); "Nic k výrobě – žádná otevřená objednávka."))
 ```
 
 - Řádek 1 tučně a zmrazený.

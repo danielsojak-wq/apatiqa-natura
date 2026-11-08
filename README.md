@@ -53,7 +53,9 @@ odeslání formuláře ── objednávka ▶  doPost  ── zapisuje ───
   list **Ceník** a vrátí jen produkty se zaškrtnutým **Aktivní**.
 - Po odeslání formuláře pošle web skriptu kontakt a vybrané položky. Skript
   přidělí číslo objednávky (`OBJ-001`, `OBJ-002`, … — vždy nejvyšší
-  existující + 1), ceny si vezme z Ceníku (ne z prohlížeče) a zapíše jeden
+  číslo z Objednávek i Položek + 1, takže číslo objednávky, jejíž řádky
+  zůstaly v Položkách, se znovu nepoužije), ceny si vezme z Ceníku (ne
+  z prohlížeče) a zapíše jeden
   řádek do **Objednávek** a jeden řádek za každou položku do **Položek**.
 - Web zobrazí „Děkuji, objednávka dorazila“, jen když skript potvrdí zápis.
   Jinak zobrazí chybu s telefonem.
@@ -64,7 +66,7 @@ odeslání formuláře ── objednávka ▶  doPost  ── zapisuje ───
 |---|---|---|
 | **Ceník** | co je na webu a za kolik | mamka (kapitola 6) |
 | **Objednávky** | řádek na objednávku | skript; mamka sloupce Stav, Zaplaceno, Termín předání |
-| **Položky** | řádek na objednanou položku, propojené Číslem objednávky | skript; sloupec J (Stav objednávky) je vzorec |
+| **Položky** (skrytý list) | řádek na objednanou položku, propojené Číslem objednávky; z nich počítá K výrobě | skript; sloupec J (Stav objednávky) je vzorec. Zobrazit: menu Zobrazit → Skryté listy (View → Hidden sheets) |
 | **K výrobě** | kolik kusů čeho vyrobit a kolik várek uvařit | nikdo, jen vzorce |
 | **Form Responses 1** | pozůstatek starého Google Formuláře, nepoužívá se | — |
 
@@ -349,10 +351,16 @@ nahoře na stránce jsou v `assets/herbar/`.
   Jednotlivé kusy jsou v Položkách se stejným číslem objednávky.
 - **Stav** přepínej v rozbalovacím seznamu: Ke zpracování → Ve výrobě →
   Vyrobeno → Doručeno. **Zaplaceno** zaškrtni. **Termín předání** piš volně.
-- **K výrobě** sčítá kusy z objednávek ve stavu Ke zpracování a Ve výrobě.
-  Když objednávku přepneš na Vyrobeno, z K výrobě zmizí.
+- **K výrobě** ukazuje jen produkty, které je potřeba vyrobit: sčítá kusy
+  z objednávek ve stavu Ke zpracování a Ve výrobě. Když objednávku přepneš
+  na Vyrobeno, její kusy z K výrobě zmizí; když není co vyrábět, stojí tam
+  „Nic k výrobě“. **Dávek uvařit** se spočítá, jen když je v Ceníku
+  vyplněné **Ks z dávky**. Vzorec je jediný, v buňce A2.
 - **Zrušená objednávka:** smaž její řádek v Objednávkách i všechny řádky se
-  stejným číslem v Položkách. Celé řádky, ne jen obsah.
+  stejným číslem v Položkách (skrytý list, viz výše). Celé řádky, ne jen
+  obsah. Když řádky v Položkách zůstanou, nic se nerozbije: číslo se znovu
+  nepoužije a K výrobě je nepočítá (jejich Stav objednávky je prázdný).
+  V Položkách jen zbydou zbytečné řádky.
 
 ---
 

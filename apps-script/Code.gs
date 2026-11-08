@@ -328,7 +328,11 @@ function zapisObjednavku(o) {
   const objednavky = otevriList('objednavky');
   const polozky = otevriList('polozky');
 
-  const cislo = PREFIX_CISLA + String(nejvyssiCislo(objednavky) + 1).padStart(3, '0');
+  // Nejvyšší číslo z Objednávek i Položek: když se objednávka smaže jen
+  // v Objednávkách, její řádky v Položkách by se jinak přilepily k nové
+  // objednávce se stejným číslem a K výrobě by je počítalo.
+  const posledni = Math.max(nejvyssiCislo(objednavky), nejvyssiCislo(polozky));
+  const cislo = PREFIX_CISLA + String(posledni + 1).padStart(3, '0');
   const datum = new Date();
 
   // Texty od zákaznice jdou do buněk jako text (viz jakoText),
@@ -365,7 +369,7 @@ function zapisObjednavku(o) {
   return cislo;
 }
 
-/** Nejvyšší pořadové číslo, které už v listu Objednávky je (OBJ-012 → 12). */
+/** Nejvyšší pořadové číslo, které už v listu je (OBJ-012 → 12). */
 function nejvyssiCislo(cil) {
   const hodnoty = hodnotySloupce(cil, 'cislo');
   let max = 0;
