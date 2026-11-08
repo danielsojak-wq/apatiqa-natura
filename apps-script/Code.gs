@@ -3,11 +3,13 @@
  * =================================================================
  *
  * Skript pracuje s tabulkou „Objednávky – Apatiqa Natura“ (ID níž
- * v ID_TABULKY), se třemi listy:
+ * v ID_TABULKY), se čtyřmi listy:
  *
  *   Ceník       produkty a ceny; edituje je mamka, web je čte přes doGet
  *   Objednávky  jeden řádek na objednávku, zapisuje doPost
  *   Položky     jeden řádek na objednanou položku, zapisuje doPost
+ *   Nastavení   limit produktů a režim dovolená; edituje mamka,
+ *               web ho dostává spolu s ceníkem, doPost ho hlídá
  *
  * SLOUPCE SE HLEDAJÍ PODLE NÁZVU v prvním řádku listu, ne podle pozice.
  * Na velikosti písmen, diakritice, mezerách a závorkách nezáleží
@@ -39,8 +41,22 @@ const ID_TABULKY = '1P6o3TitO6AAj8HUkCom7DNztkKcQo_IriAUA3kQkWWw';
 const LISTY = {
   cenik: 'Ceník',
   objednavky: 'Objednávky',
-  polozky: 'Položky'
+  polozky: 'Položky',
+  nastaveni: 'Nastavení'
 };
+
+/**
+ * Řádky listu Nastavení: ve sloupci A popisek, ve sloupci B hodnota.
+ * Popisky se porovnávají jako názvy sloupců (na diakritice, mezerách
+ * a tečkách nezáleží). Chybí-li list nebo řádek, platí výchozí hodnota:
+ * bez omezení, bez dovolené.
+ */
+const NASTAVENI = {
+  maxProduktu: 'Max. různých produktů v objednávce', // číslo; prázdné = bez omezení; velikosti téhož produktu = 1
+  dovolena: 'Režim dovolená',                        // zaškrtnuto = objednávky se nepřijímají
+  dovolenaText: 'Hláška o dovolené'                  // text pruhu na webu a v souhrnu
+};
+const VYCHOZI_HLASKA_DOVOLENA = 'Jsem na dovolené, objednávky teď nepřijímám. Děkuji za pochopení.';
 
 /**
  * Názvy sloupců v hlavičce (řádek 1) každého listu.
@@ -105,9 +121,10 @@ const MAX_POLOZEK = 100;               // pojistka proti nesmyslně velkým pož
 /* =================================================================
    doGet — ceník pro web
    =================================================================
-   Vrací aktivní řádky listu Ceník seřazené podle Pořadí:
+   Vrací aktivní řádky listu Ceník seřazené podle Pořadí a nastavení:
    { "produkty": [ { id, kategorie, produkt, varianta, cena,
-                     popis, ikona, aktivni, poradi }, … ] }
+                     popis, ikona, aktivni, poradi }, … ],
+     "nastaveni": { maxProduktu, dovolena, dovolenaText } }
 
    „id“ skript skládá z produktu a varianty (např.
    „mesickova-mast-balzam-30-ml“); mamka ho nikde nevyplňuje.
@@ -129,7 +146,7 @@ function doGet() {
         aktivni: true,
         poradi: r.poradi === Infinity ? null : r.poradi
       }));
-    return json({ produkty: produkty });
+    return json({ produkty: produkty, nastaveni: nactiNastaveni() });
   } catch (chyba) {
     console.error(chyba);
     return json({ chyba: zprava(chyba) });
@@ -150,7 +167,9 @@ function doGet() {
    nepřevezme. Když se cena mezitím v Ceníku změnila, platí Ceník.
 
    Odpověď: { ok: true, cislo: "OBJ-007", celkem: 390 }
-        nebo { ok: false, chyba: "…" }
+        nebo { ok: false, chyba: "…", zobrazit: true|false }
+   „zobrazit“ = text chyby je pro zákaznici (dovolená, limit produktů …)
+   a web ho ukáže; jinak ukáže obecnou hlášku s telefonem.
    Apps Script vrací HTTP 200 i při chybě, proto web musí číst „ok“.
    ================================================================= */
 
@@ -163,13 +182,13 @@ function doPost(e) {
     // Zámek brání tomu, aby dvě souběžné objednávky dostaly stejné číslo
     // nebo se zapsaly do stejného řádku.
     zamceno = zamek.tryLock(30000);
-    if (!zamceno) throw new Error('Tabulka je právě zaneprázdněná, zkuste to prosím znovu.');
+    if (!zamceno) throw proZakaznici('Tabulka je právě zaneprázdněná, zkuste to prosím znovu.');
 
     const cislo = zapisObjednavku(objednavka);
     return json({ ok: true, cislo: cislo, celkem: objednavka.celkem });
   } catch (chyba) {
     console.error(chyba);
-    return json({ ok: false, chyba: zprava(chyba) });
+    return json({ ok: false, chyba: zprava(chyba), zobrazit: Boolean(chyba && chyba.proZakaznici) });
   } finally {
     if (zamceno) zamek.releaseLock();
   }
@@ -264,6 +283,9 @@ function nactiCenik() {
  * Při jakékoli nesrovnalosti vyhodí chybu, nic se nezapíše.
  */
 function pripravObjednavku(p) {
+  const nastaveni = nactiNastaveni();
+  if (nastaveni.dovolena) throw proZakaznici(nastaveni.dovolenaText);
+
   const jmeno = omez(p.jmeno, 200);
   const telefon = omez(p.telefon, 50);
   if (!jmeno || !telefon) throw new Error('Chybí jméno nebo telefon.');
@@ -286,7 +308,7 @@ function pripravObjednavku(p) {
     const r = cenik[String(v && v.id)];
     if (!r) {
       const nazev = v ? [v.nazev, v.varianta].filter(Boolean).join(' ') : '';
-      throw new Error('Položka „' + (nazev || '?') + '“ už v ceníku není. Načtěte prosím stránku znovu.');
+      throw proZakaznici('Položka „' + (nazev || '?') + '“ už v ceníku není. Načtěte prosím stránku znovu.');
     }
     const pocet = Number(v.pocet);
     if (!Number.isInteger(pocet) || pocet < 1 || pocet > MAX_KUSU) {
@@ -302,6 +324,14 @@ function pripravObjednavku(p) {
       celkem: zaokrouhli(pocet * r.cena)
     };
   });
+
+  // Limit z Nastavení počítá různé produkty: velikosti téhož produktu
+  // se vaří v jedné várce, takže se počítají jednou.
+  const produktu = new Set(polozky.map((x) => x.kategorie + '|' + x.produkt)).size;
+  if (nastaveni.maxProduktu && produktu > nastaveni.maxProduktu) {
+    throw proZakaznici('V jedné objednávce může být nejvýš ' + nastaveni.maxProduktu + ' ' +
+      slovoProduktu(nastaveni.maxProduktu) + '. Ubrat prosím ' + (produktu - nastaveni.maxProduktu) + '.');
+  }
 
   return {
     jmeno: jmeno,
@@ -382,15 +412,61 @@ function nejvyssiCislo(cil) {
 
 
 /* =================================================================
+   NASTAVENÍ
+   ================================================================= */
+
+/**
+ * Načte list Nastavení: { maxProduktu: číslo | null, dovolena, dovolenaText }.
+ * Chybějící list, řádek nebo nesmyslná hodnota nic nerozbije — platí
+ * výchozí hodnota (bez omezení, bez dovolené) a web i objednávky jedou dál.
+ */
+function nactiNastaveni() {
+  const vysledek = { maxProduktu: null, dovolena: false, dovolenaText: '' };
+  try {
+    const list = otevriTabulku().getSheetByName(LISTY.nastaveni);
+    if (!list || list.getLastRow() < 1) return vysledek;
+
+    const podlePopisku = {};
+    list.getRange(1, 1, list.getLastRow(), 2).getValues().forEach((r) => {
+      const k = klicSloupce(r[0]);
+      if (k && !(k in podlePopisku)) podlePopisku[k] = r[1];
+    });
+    const hodnota = (pole) => podlePopisku[klicSloupce(NASTAVENI[pole])];
+
+    const max = castka(hodnota('maxProduktu'));
+    if (isFinite(max) && max >= 1) vysledek.maxProduktu = Math.floor(max);
+    vysledek.dovolena = jeAno(hodnota('dovolena'));
+    if (vysledek.dovolena) vysledek.dovolenaText = text(hodnota('dovolenaText')) || VYCHOZI_HLASKA_DOVOLENA;
+  } catch (chyba) {
+    console.warn('Nastavení se nenačetlo, platí výchozí: ' + zprava(chyba));
+  }
+  return vysledek;
+}
+
+/** „produkt“ / „různé produkty“ / „různých produktů“ podle počtu. */
+function slovoProduktu(n) {
+  if (n === 1) return 'produkt';
+  return n >= 2 && n <= 4 ? 'různé produkty' : 'různých produktů';
+}
+
+
+/* =================================================================
    PRÁCE S LISTY
    ================================================================= */
+
+let tabulka = null;   // v rámci jednoho volání se tabulka otevírá jen jednou
+
+function otevriTabulku() {
+  if (!tabulka) tabulka = SpreadsheetApp.openById(ID_TABULKY);
+  return tabulka;
+}
 
 /**
  * Najde list a v jeho hlavičce sloupce podle SLOUPCE[druh].
  * Vrací { list, sloupce: { pole: číslo sloupce od 1 } }.
  */
 function otevriList(druh) {
-  const list = SpreadsheetApp.openById(ID_TABULKY).getSheetByName(LISTY[druh]);
+  const list = otevriTabulku().getSheetByName(LISTY[druh]);
   if (!list) throw new Error('V tabulce chybí list „' + LISTY[druh] + '“.');
 
   const posledni = list.getLastColumn();
@@ -532,6 +608,13 @@ function zaokrouhli(cislo) {
  */
 function jakoText(hodnota) {
   return hodnota ? "'" + hodnota : '';
+}
+
+/** Chyba, jejíž text web ukáže zákaznici (jinak ukáže obecnou hlášku). */
+function proZakaznici(textChyby) {
+  const chyba = new Error(textChyby);
+  chyba.proZakaznici = true;
+  return chyba;
 }
 
 /** Text chyby pro odpověď. */

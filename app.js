@@ -18,6 +18,12 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbx5Jn3drgWjJ3K6O4gCkyg
 
 let KATALOG = [];   // [{ nazev, barva, polozky: [{ nazev, popis, ikona, varianty: [{ id, label, cena }] }] }]
 
+/* Nastavení z listu Nastavení (chodí z doGet spolu s ceníkem):
+   limit různých produktů v objednávce (velikosti téhož produktu se
+   počítají jednou) a režim dovolená.                                 */
+const VYCHOZI_HLASKA_DOVOLENA = 'Jsem na dovolené, objednávky teď nepřijímám. Děkuji za pochopení.';
+let NASTAVENI = { maxProduktu: null, dovolena: false, dovolenaText: '' };
+
 // Barvy hlaviček kategorií z návrhu. Nová kategorie dostane barvu podle pořadí.
 const BARVY_KATEGORII = {
   'Masti a balzámy': '#3C5330',
@@ -28,7 +34,7 @@ const BARVY_KATEGORII = {
 const BARVY_DALSI = ['#3C5330', '#55683D', '#6E7F4F', '#8A6A5B'];
 
 const LIMIT_NACTENI = 15000;   // ms; pak se místo ceníku ukáže telefon
-const KLIC_CENIKU = 'apatiqa-cenik';                // localStorage
+const KLIC_CENIKU = 'apatiqa-cenik-2';              // localStorage (2 = ceník i nastavení)
 const MAX_STARI_CENIKU = 14 * 24 * 60 * 60 * 1000;  // starší uložený ceník se neukáže
 
 /* Náhled na localhostu: dokud je ENDPOINT prázdný, ceník se vezme
@@ -81,7 +87,8 @@ function sestavKatalog(produkty) {
   return kategorie;
 }
 
-/* Stáhne řádky ceníku (odpověď doGet). Vyhodí chybu, když se nepovede. */
+/* Stáhne ceník a nastavení (odpověď doGet) jako { produkty, nastaveni }.
+   Vyhodí chybu, když se nepovede.                                    */
 async function stahniCenik(zdroj) {
   if (!zdroj) throw new Error('ENDPOINT v app.js není vyplněný.');
   if (!ENDPOINT) console.warn('ENDPOINT je prázdný, ceník je ukázkový z ' + UKAZKOVY_CENIK + '.');
@@ -94,27 +101,87 @@ async function stahniCenik(zdroj) {
     if (!odpoved.ok) throw new Error('HTTP ' + odpoved.status);
     const data = await odpoved.json();
     if (!data || !Array.isArray(data.produkty)) throw new Error((data && data.chyba) || 'Neplatná odpověď.');
-    return data.produkty;
+    return { produkty: data.produkty, nastaveni: data.nastaveni || {} };
   } finally {
     clearTimeout(casovac);
   }
 }
 
-/* Uložený ceník z minulé návštěvy, nebo null. localStorage může být
-   vypnutý (anonymní okno, zablokovaná data), proto všude try/catch.  */
+/* Uložený ceník z minulé návštěvy ({ produkty, nastaveni }), nebo null.
+   localStorage může být vypnutý (anonymní okno, zablokovaná data),
+   proto všude try/catch.                                             */
 function ulozenyCenik(zdroj) {
   try {
     const u = JSON.parse(localStorage.getItem(KLIC_CENIKU));
-    if (u && u.zdroj === zdroj && Array.isArray(u.produkty) && Date.now() - u.cas < MAX_STARI_CENIKU) return u.produkty;
+    if (u && u.zdroj === zdroj && u.data && Array.isArray(u.data.produkty) && Date.now() - u.cas < MAX_STARI_CENIKU) return u.data;
   } catch (_) { /* bez uloženého ceníku */ }
   return null;
 }
 
-function ulozCenik(zdroj, produkty) {
+function ulozCenik(zdroj, data) {
   try {
-    if (produkty) localStorage.setItem(KLIC_CENIKU, JSON.stringify({ zdroj, cas: Date.now(), produkty }));
+    localStorage.removeItem('apatiqa-cenik');   // úložiště před verzí s nastavením
+    if (data) localStorage.setItem(KLIC_CENIKU, JSON.stringify({ zdroj, cas: Date.now(), data }));
     else localStorage.removeItem(KLIC_CENIKU);
   } catch (_) { /* nevadí, příště se jen čeká déle */ }
+}
+
+/* Nastavení z doGet → NASTAVENI; nesmyslné hodnoty = výchozí. */
+function pouzijNastaveni(n) {
+  n = n || {};
+  const max = Number(n.maxProduktu);
+  const dovolena = n.dovolena === true;
+  NASTAVENI = {
+    maxProduktu: Number.isInteger(max) && max >= 1 ? max : null,
+    dovolena,
+    dovolenaText: dovolena ? String(n.dovolenaText || '').trim() || VYCHOZI_HLASKA_DOVOLENA : ''
+  };
+  vykresliOznameni();
+  vykresliSouhrn();
+}
+
+/* Pruh nahoře na stránce, vidět i při rolování. Jeho výšku dostanou
+   v --oznameni lepivé prvky a skoky na kotvy, aby nezajely pod něj.  */
+function vykresliOznameni() {
+  const pruh = document.getElementById('oznameni');
+  if (!pruh) return;
+  pruh.textContent = NASTAVENI.dovolenaText;
+  pruh.hidden = !NASTAVENI.dovolena;
+  document.documentElement.style.setProperty('--oznameni', pruh.offsetHeight + 'px');
+}
+
+/* „produkt“ / „různé produkty“ / „různých produktů“ podle počtu. */
+function slovoProduktu(n) {
+  if (n === 1) return 'produkt';
+  return n >= 2 && n <= 4 ? 'různé produkty' : 'různých produktů';
+}
+
+const textLimitu = (max) => 'V jedné objednávce může být nejvýš ' + max + ' ' + slovoProduktu(max) + '.';
+
+/* Produkty, ze kterých je něco vybráno; velikosti téhož produktu = jeden. */
+function vybraneProdukty() {
+  const out = [];
+  KATALOG.forEach((kat) => kat.polozky.forEach((p) => {
+    if (p.varianty.some((v) => mnozstvi[v.id] > 0)) out.push(p);
+  }));
+  return out;
+}
+
+/* Patří varianta k produktu, ze kterého už je něco vybráno? */
+function produktUzVybrany(id) {
+  return KATALOG.some((kat) => kat.polozky.some((p) =>
+    p.varianty.some((v) => v.id === id) && p.varianty.some((v) => mnozstvi[v.id] > 0)));
+}
+
+/* Krátká hláška nad košíkem (např. při překročení limitu položek). */
+let casovacHlasky = null;
+function upozorni(text) {
+  const h = document.getElementById('hlaska');
+  if (!h) return;
+  h.textContent = text;
+  h.classList.add('je-videt');
+  clearTimeout(casovacHlasky);
+  casovacHlasky = setTimeout(() => h.classList.remove('je-videt'), 4500);
 }
 
 /* Vykreslí ceník z řádků doGet; vybraná množství zůstanou.
@@ -235,6 +302,13 @@ function stepper(polozka, v) {
    takže stepper v ceníku, souhrn, košík i tlačítko vždy sedí. */
 function nastavMnozstvi(id, n) {
   n = Math.max(0, Math.min(20, n));
+  // Limit různých produktů z Nastavení: nový produkt nad limit nepřidá;
+  // další kusy a velikosti už vybraného produktu ano.
+  const max = NASTAVENI.maxProduktu;
+  if (max && n > 0 && !mnozstvi[id] && !produktUzVybrany(id) && vybraneProdukty().length >= max) {
+    upozorni(textLimitu(max));
+    return;
+  }
   mnozstvi[id] = n;
   const o = document.getElementById('out-' + id);
   if (o) { o.textContent = String(n); o.classList.toggle('ma-hodnotu', n > 0); }
@@ -262,6 +336,19 @@ function vykresliSouhrn() {
 
   cil.textContent = '';
   vykresliPrehled(polozky);
+
+  // Dovolená: hláška nahoře v souhrnu, odeslat nejde.
+  // Limit produktů: upozornění, když je naplněný; nad limit odeslat nejde
+  // (stane se, jen když se limit v tabulce sníží, zatímco má někdo vybráno).
+  const max = NASTAVENI.maxProduktu;
+  const produktu = vybraneProdukty().length;
+  const nadLimit = Boolean(max && produktu > max);
+  if (NASTAVENI.dovolena) cil.append(el('p', 'souhrn__upozorneni', NASTAVENI.dovolenaText));
+  if (max && produktu >= max) {
+    cil.append(el('p', 'souhrn__upozorneni', textLimitu(max) + (nadLimit
+      ? ' Ubrat prosím ' + (produktu - max) + '.'
+      : ' Další kusy a velikosti už vybraných produktů přidat jde.')));
+  }
 
   if (!polozky.length) {
     cil.append(el('p', 'souhrn__prazdno', 'Zatím nic nevybráno. Množství zadáte výš v ceníku.'));
@@ -305,7 +392,7 @@ function vykresliSouhrn() {
   paticka.append(el('p', 'castka', kc(celkem)));
   cil.append(paticka);
 
-  document.getElementById('odeslat').disabled = false;
+  document.getElementById('odeslat').disabled = NASTAVENI.dovolena || nadLimit;
 
   if (fokus) {
     const tlacitko = cil.querySelector('button[data-id="' + fokus.id + '"][data-akce="' + fokus.akce + '"]')
@@ -352,7 +439,8 @@ function vykresliPrehled(polozky) {
     o.pocet.hidden = !n;
   });
 
-  document.getElementById('odeslat').textContent = kusu ? 'Odeslat objednávku · ' + kc(celkem) : 'Odeslat objednávku';
+  document.getElementById('odeslat').textContent = NASTAVENI.dovolena ? 'Objednávky teď nepřijímám'
+    : kusu ? 'Odeslat objednávku · ' + kc(celkem) : 'Odeslat objednávku';
 }
 
 /* Rozcestník kategorií nad ceníkem; zvýrazní kategorii, kterou máte před sebou. */
@@ -413,6 +501,7 @@ async function odesli(e) {
 
   if (form.web.value) return;                     // honeypot
   if (Date.now() - nacteno < 3000) return;        // časová past
+  if (NASTAVENI.dovolena) return;                 // tlačítko je vypnuté, tohle je pojistka
 
   if (!form.jmeno.value.trim() || !form.telefon.value.trim()) {
     stav.textContent = 'Vyplňte prosím jméno a telefon.';
@@ -429,6 +518,7 @@ async function odesli(e) {
 
   const polozky = vybrane();
   if (!polozky.length) return;
+  if (NASTAVENI.maxProduktu && vybraneProdukty().length > NASTAVENI.maxProduktu) return;
 
   tlacitko.disabled = true;
   stav.textContent = 'Odesílám…';
@@ -458,12 +548,18 @@ async function odesli(e) {
     if (!odpoved.ok) throw new Error('HTTP ' + odpoved.status);
     // Apps Script vrací HTTP 200 i při chybě — o zápisu rozhoduje až "ok".
     const vysledek = await odpoved.json();
-    if (!vysledek || vysledek.ok !== true) throw new Error((vysledek && vysledek.chyba) || 'Objednávka se nezapsala.');
+    if (!vysledek || vysledek.ok !== true) {
+      const chyba = new Error((vysledek && vysledek.chyba) || 'Objednávka se nezapsala.');
+      chyba.zobrazit = Boolean(vysledek && vysledek.zobrazit);   // text je pro zákaznici (dovolená, limit …)
+      throw chyba;
+    }
     hotovo(stav, form);
     if (vysledek.cislo) stav.textContent += ' Číslo objednávky: ' + vysledek.cislo + '.';
   } catch (chyba) {
     console.error(chyba);
-    stav.textContent = 'Objednávku se nepodařilo odeslat. Zkuste to prosím znovu, nebo zavolejte na +420 776 349 774.';
+    stav.textContent = chyba.zobrazit
+      ? chyba.message + ' Případně volejte +420 776 349 774.'
+      : 'Objednávku se nepodařilo odeslat. Zkuste to prosím znovu, nebo zavolejte na +420 776 349 774.';
     stav.className = 'stav stav--chyba';
     tlacitko.disabled = false;
   }
@@ -481,30 +577,45 @@ function hotovo(stav, form) {
   stav.className = 'stav stav--ok';
 }
 
+/* Výška pruhu se mění s šířkou okna (text se zalomí); --oznameni drží krok. */
+function hlidejOznameni() {
+  const pruh = document.getElementById('oznameni');
+  if (!pruh || !('ResizeObserver' in window)) return;
+  new ResizeObserver(() => document.documentElement.style.setProperty('--oznameni', pruh.offsetHeight + 'px')).observe(pruh);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   vykresliSouhrn();
   hlidejKosik();
+  hlidejOznameni();
   document.getElementById('form').addEventListener('submit', odesli);
 
-  // Uložený ceník z minulé návštěvy hned; jinak do konce načítání
-  // zůstává v #katalog text „Načítám ceník…“ z index.html.
+  // Uložený ceník a nastavení z minulé návštěvy hned; jinak do konce
+  // načítání zůstává v #katalog text „Načítám ceník…“ z index.html.
   const zdroj = ENDPOINT || (JE_LOCALHOST ? UKAZKOVY_CENIK : '');
   const ulozeny = ulozenyCenik(zdroj);
-  const zUlozeneho = Boolean(ulozeny && zobrazCenik(ulozeny));
+  let zUlozeneho = false;
+  if (ulozeny) {
+    pouzijNastaveni(ulozeny.nastaveni);
+    zUlozeneho = zobrazCenik(ulozeny.produkty);
+  }
 
-  let produkty;
+  let data;
   try {
-    produkty = await stahniCenik(zdroj);
+    data = await stahniCenik(zdroj);
   } catch (chyba) {
     console.error('Ceník se nenačetl:', chyba);
     if (!zUlozeneho) vykresliChybuKatalogu();   // jinak zůstane uložený ceník
     return;
   }
 
-  if (zUlozeneho && JSON.stringify(produkty) === JSON.stringify(ulozeny)) {
-    ulozCenik(zdroj, produkty);                 // beze změny, jen obnoví čas
-  } else if (zobrazCenik(produkty)) {
-    ulozCenik(zdroj, produkty);
+  if (zUlozeneho && JSON.stringify(data) === JSON.stringify(ulozeny)) {
+    ulozCenik(zdroj, data);                     // beze změny, jen obnoví čas
+    return;
+  }
+  pouzijNastaveni(data.nastaveni);
+  if (zobrazCenik(data.produkty)) {
+    ulozCenik(zdroj, data);
   } else {
     console.error('Ceník se nenačetl: v ceníku není nic aktivního.');
     ulozCenik(zdroj, null);

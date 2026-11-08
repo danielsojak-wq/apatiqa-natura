@@ -455,7 +455,7 @@ h1, h2, h3 {
 .katalog__loading a { color: var(--zelena); font-weight: 600; white-space: nowrap; }
 
 .kategorie {
-  scroll-margin-top: 88px;   /* aby skok z rozcestníku neskončil pod ním */
+  scroll-margin-top: calc(88px + var(--oznameni, 0px));   /* aby skok z rozcestníku neskončil pod ním ani pod pruhem */
   background: var(--papir);
   border: 1px solid var(--linka); border-radius: 6px; overflow: hidden;
   box-shadow: 0 20px 40px -32px rgba(30, 42, 27, .5);
@@ -557,6 +557,12 @@ h1, h2, h3 {
   font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--hlina);
 }
 .souhrn__prazdno { margin: 0; font-size: 15px; color: var(--text-2); }
+/* dovolená nebo naplněný limit produktů (list Nastavení) */
+.souhrn__upozorneni {
+  margin: 0 0 14px; padding: 12px 14px;
+  background: #FBEBD3; border: 1px solid #EFC88E; border-radius: 6px;
+  color: #6B4512; font-size: 15px; font-weight: 600; line-height: 1.45;
+}
 /* řádek souhrnu: název a cena za kus | − počet + | celkem za položku */
 .souhrn__radek {
   display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px 16px;
@@ -654,7 +660,7 @@ h1, h2, h3 {
 /* ---------- ROZCESTNÍK KATEGORIÍ ---------- */
 
 .rozcestnik {
-  position: sticky; top: 12px; z-index: 20;
+  position: sticky; top: calc(12px + var(--oznameni, 0px)); z-index: 20;
   display: flex; gap: 6px; width: fit-content; max-width: 100%;
   margin: 0 0 28px; padding: 6px;
   overflow-x: auto; scrollbar-width: none;
@@ -713,6 +719,37 @@ h1, h2, h3 {
 }
 .kosik__text strong { font-weight: 600; }
 .kosik__btn { flex: none; min-height: 48px; padding: 0 22px; font-size: 14.5px; }
+
+/* krátká hláška nad košíkem, např. „nejvýš 10 různých položek“ */
+.hlaska {
+  position: fixed; z-index: 31; left: 50%;
+  bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  width: max-content; max-width: min(520px, calc(100% - 32px));
+  margin: 0; padding: 12px 18px;
+  background: var(--papir); color: #8C3B2A;
+  border: 1px solid #DFB4A4; border-radius: 12px;
+  box-shadow: 0 18px 36px -18px rgba(5, 15, 7, .55);
+  font-size: 15px; font-weight: 600; line-height: 1.4; text-align: center;
+  opacity: 0; visibility: hidden; transform: translate(-50%, 8px);
+  transition: opacity .25s, transform .25s, visibility 0s linear .25s;
+}
+.hlaska.je-videt {
+  opacity: 1; visibility: visible; transform: translate(-50%, 0);
+  transition: opacity .25s, transform .25s, visibility 0s;
+}
+
+/* ---------- PRUH S HLÁŠKOU (dovolená) ---------- */
+
+.oznameni {
+  position: sticky; top: 0; z-index: 40;
+  margin: 0; padding: 11px var(--okraj);
+  background: var(--mesicek); color: var(--les);
+  font-size: 15px; font-weight: 600; line-height: 1.4; text-align: center;
+  box-shadow: 0 6px 18px -10px rgba(5, 15, 7, .5);
+}
+.oznameni[hidden] { display: none; }
+/* skoky na kotvy nezajedou pod pruh; :where = nulová váha, .kategorie má vlastní */
+:where([id]) { scroll-margin-top: var(--oznameni, 0px); }
 
 /* ---------- PATIČKA ---------- */
 
@@ -784,7 +821,7 @@ h1, h2, h3 {
 
   .objednavka__inner { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); column-gap: 56px; }
   .objednavka .section-head { grid-column: 1 / -1; }
-  .souhrn { position: sticky; top: 24px; }
+  .souhrn { position: sticky; top: calc(24px + var(--oznameni, 0px)); }
 }
 
 /* zásady: tablet dvě a dvě, desktop čtyři vedle sebe */
@@ -807,5 +844,5 @@ h1, h2, h3 {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .arch, .pas__stopa, .pecet__kruh { animation: none; }
-  .arch, .btn, .stepper, .kosik, .kosik.je-videt { transition: none; }
+  .arch, .btn, .stepper, .kosik, .kosik.je-videt, .hlaska, .hlaska.je-videt { transition: none; }
 }

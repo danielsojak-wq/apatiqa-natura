@@ -68,6 +68,7 @@ odeslání formuláře ── objednávka ▶  doPost  ── zapisuje ───
 | **Objednávky** | řádek na objednávku | skript; mamka sloupce Stav, Zaplaceno, Termín předání |
 | **Položky** (skrytý list) | řádek na objednanou položku, propojené Číslem objednávky; z nich počítá K výrobě | skript; sloupec J (Stav objednávky) je vzorec. Zobrazit: menu Zobrazit → Skryté listy (View → Hidden sheets) |
 | **K výrobě** | kolik kusů čeho vyrobit a kolik várek uvařit | nikdo, jen vzorce |
+| **Nastavení** | limit různých produktů v objednávce, režim dovolená a jeho hláška | mamka (kapitola 6) |
 | **Form Responses 1** | pozůstatek starého Google Formuláře, nepoužívá se | — |
 
 ### Soubory v repozitáři
@@ -362,6 +363,19 @@ nahoře na stránce jsou v `assets/herbar/`.
   nepoužije a K výrobě je nepočítá (jejich Stav objednávky je prázdný).
   V Položkách jen zbydou zbytečné řádky.
 
+### Nastavení: limit produktů a dovolená
+
+List **Nastavení**, hodnoty se píšou do sloupce **Hodnota**. Změna se na webu
+projeví při dalším načtení stránky. Popisky ve sloupci A nepřejmenovávej,
+skript je podle nich hledá (když řádek nenajde, platí „bez omezení, bez
+dovolené“ a web jede dál).
+
+| Nastavení | Co dělá |
+|---|---|
+| **Max. různých produktů v objednávce** | Kolik různých produktů smí být v jedné objednávce. Velikosti téhož produktu se počítají jednou (Měsíčková mast 30 ml i 50 ml = 1 produkt), počet kusů nehraje roli. Prázdné = bez omezení. Když zákaznice zkusí přidat další produkt, nepřidá se a web jí to napíše; v souhrnu je upozornění. Skript limit hlídá i při odeslání. |
+| **Režim dovolená** | Zaškrtnuto = nahoře na webu je pruh s hláškou (zůstává vidět i při rolování), stejná hláška je v souhrnu objednávky a tlačítko Odeslat je vypnuté. Ceník zůstane vidět. Skript objednávku nepřijme, ani kdyby přišla ze stránky otevřené dřív. |
+| **Hláška o dovolené** | Text pruhu a hlášky v souhrnu. Prázdné = „Jsem na dovolené, objednávky teď nepřijímám. Děkuji za pochopení.“ |
+
 ---
 
 ## 7. Když přestanou chodit objednávky
@@ -407,6 +421,7 @@ nenasazuje.
 | Objednávky | **Číslo objednávky** · Datum · **Jméno a příjmení** · **Telefon** · E-mail · Způsob předání · Adresa · Poznámka · **Objednáno** · Celkem (Kč) · Zdroj · Stav · Zaplaceno · Termín předání |
 | Položky | **Číslo objednávky** · Datum · Kategorie · **Produkt** · **Varianta** · **Počet** · Cena za kus (Kč) · Celkem (Kč) · ID · *(J: vzorec „Stav objednávky“)* |
 | Ceník | Kategorie · **Produkt** · **Varianta** · **Cena** · Popis · Ikona · Aktivní · Pořadí · Ks z dávky |
+| Nastavení | popisky ve sloupci A: Max. různých produktů v objednávce · Režim dovolená · Hláška o dovolené (bez nich platí výchozí, nic se nerozbije) |
 
 ### B) Nové nasazení Apps Scriptu a stará adresa v `ENDPOINT`
 
