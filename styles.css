@@ -77,6 +77,7 @@ h1, h2, h3 {
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-weight: 400;
+  overflow-wrap: break-word;   /* při velkém zvětšení písma se slovo zalomí, místo aby přeteklo */
 }
 
 .wrap { max-width: var(--max); margin: 0 auto; }
@@ -98,7 +99,7 @@ h1, h2, h3 {
   min-height: 54px; padding: 0 30px;
   background: var(--zelena); color: var(--krem);
   border: none; border-radius: 999px; text-decoration: none; cursor: pointer;
-  font: 600 15px/1 var(--sans); letter-spacing: 0.02em;
+  font: 600 15px/1 var(--sans); letter-spacing: 0.02em; text-align: center;
   transition: background-color .2s, transform .2s;
 }
 .btn:hover { background: var(--les-2); }
@@ -137,7 +138,7 @@ h1, h2, h3 {
 
 .lista {
   max-width: var(--max); margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px;   /* bez místa telefon spadne pod logo */
   padding: 20px 0;
 }
 
@@ -178,7 +179,7 @@ h1, h2, h3 {
 .hero__obsah {
   position: relative; z-index: 1;
   max-width: var(--max); margin: 0 auto;
-  display: grid; gap: 40px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px;
   padding-top: clamp(28px, 6vw, 64px);
 }
 
@@ -386,9 +387,10 @@ h1, h2, h3 {
 /* ---------- PŘÍBĚH ---------- */
 
 .pribeh { padding: clamp(56px, 8vw, 112px) var(--okraj); background: var(--papir); border-block: 1px solid var(--linka); }
-.pribeh__mrizka { display: grid; gap: 48px; align-items: center; }
+.pribeh__mrizka { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; align-items: center; }
 .pribeh__text { display: flex; flex-direction: column; gap: 18px; max-width: 560px; }
-.pribeh h2 { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem); line-height: 1.02; letter-spacing: -.02em; }
+/* nadpisy sekcí: na úzkém displeji (i zvětšeném) se zmenší s šířkou, ať se slovo vejde */
+.pribeh h2 { font-size: min(clamp(2.2rem, 1.4rem + 3vw, 3.6rem), 12vw); line-height: 1.02; letter-spacing: -.02em; }
 .pribeh__text > p:not(.kicker) { margin: 0; font-size: 17px; color: var(--text-2); }
 
 /* citát s portrétem výrobkyně v kruhu vlevo */
@@ -415,12 +417,13 @@ h1, h2, h3 {
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 28px 36px;
 }
 .foto {
+  max-width: 100%;
   margin: 0; padding: 14px 14px 12px;
   background: #FFFDF8; border-radius: 3px;
   box-shadow: 0 22px 40px -22px rgba(30, 42, 27, .45), 0 2px 6px rgba(30, 42, 27, .08);
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-.foto img { display: block; mix-blend-mode: multiply; }
+.foto img { display: block; max-width: 100%; height: auto; mix-blend-mode: multiply; }
 .foto figcaption {
   font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2);
   text-align: center; max-width: 24ch;
@@ -435,7 +438,7 @@ h1, h2, h3 {
 .cenik { padding: clamp(56px, 8vw, 104px) var(--okraj) clamp(48px, 6vw, 80px); }
 
 .section-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; max-width: 720px; }
-.section-head h2 { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem); line-height: 1.02; letter-spacing: -.02em; }
+.section-head h2 { font-size: min(clamp(2.2rem, 1.4rem + 3vw, 3.6rem), 12vw); line-height: 1.02; letter-spacing: -.02em; }
 .section-head > p:not(.kicker) { margin: 0; font-size: 17px; color: var(--text-2); }
 
 .kroky {
@@ -500,8 +503,9 @@ h1, h2, h3 {
 .polozka__nazev {
   margin: 0;
   font-family: var(--serif); font-size: 21px; font-weight: 450; line-height: 1.2;
+  overflow-wrap: break-word;
 }
-.polozka__popis { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--text-2); max-width: 54ch; }
+.polozka__popis { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--text-2); max-width: 54ch; overflow-wrap: break-word; }
 
 .varianty { flex: 1 1 300px; display: flex; flex-wrap: wrap; gap: 14px 24px; justify-content: flex-end; }
 .varianta { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
@@ -539,7 +543,7 @@ h1, h2, h3 {
 }
 .objednavka__inner {
   max-width: var(--max); margin: 0 auto;
-  display: grid; gap: 32px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px;
 }
 .objednavka .section-head { margin-bottom: 0; }
 
@@ -583,7 +587,7 @@ h1, h2, h3 {
 /* pás Celkem v barvě značky, přes celou šířku účtenky */
 .souhrn__celkem {
   position: relative; isolation: isolate;
-  display: flex; justify-content: space-between; align-items: baseline;
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px;
   margin: 14px calc(-1 * var(--pad)) -24px; padding: 18px var(--pad) 20px;
   background: var(--lesni-prechod-pas); color: var(--krem);
 }
@@ -760,15 +764,15 @@ h1, h2, h3 {
 }
 .paticka::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: var(--zrno); opacity: .08; }
 .paticka__top { display: flex; flex-wrap: wrap; gap: 36px; align-items: flex-end; justify-content: space-between; }
-.znacka--velka .znacka__script { font-size: clamp(64px, 10vw, 104px); -webkit-text-stroke: .6px currentColor; }
+.znacka--velka .znacka__script { font-size: min(clamp(64px, 10vw, 104px), 25vw); -webkit-text-stroke: .6px currentColor; }
 .znacka--velka .znacka__sub { font-size: clamp(13px, 1.4vw, 17px); }
 .paticka__kontakt { display: flex; flex-direction: column; gap: 6px; }
 .paticka__label {
   margin: 0; font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--mesicek-svetly);
 }
-.paticka__tel { margin: 0; font-family: var(--serif); font-size: clamp(28px, 1.2rem + 1.8vw, 40px); font-weight: 400; }
-.paticka__tel a { color: var(--krem); text-decoration: none; }
+.paticka__tel { margin: 0; font-family: var(--serif); font-size: min(clamp(28px, 1.2rem + 1.8vw, 40px), 10.5vw); font-weight: 400; }
+.paticka__tel a { color: var(--krem); text-decoration: none; white-space: nowrap; }   /* číslo se neláme; na úzkém displeji se zmenší */
 .paticka__tel a:hover { color: var(--mesicek-svetly); }
 .paticka__bottom { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(239, 231, 212, .18); }
 .paticka__bottom p { margin: 0; font-size: 14px; color: #BFCAAE; }
@@ -801,6 +805,67 @@ h1, h2, h3 {
   /* souhrn na mobilu: název přes celou šířku, pod ním počítadlo a cena */
   .souhrn__radek { grid-template-columns: minmax(0, 1fr) auto; }
   .souhrn__popis { grid-column: 1 / -1; }
+}
+
+/* ---------- MALÉ DISPLEJE A ZVĚTŠENÉ PÍSMO ----------
+   Zvětšení textu v Safari (aA) zúží stránku: iPhone X (375 px) při 125 %
+   = 300 px, 150 % = 250 px, 200 % = 187 px. Tady se nic nesmí uříznout
+   ani přetéct do strany. */
+
+@media (max-width: 360px) {
+  /* košík: šipka pryč a menší okraje, ať se vejde cena i tlačítko */
+  .kosik { gap: 10px; padding-left: 18px; }
+  .kosik__btn { padding: 0 16px; }
+  .kosik__btn::after { display: none; }
+  /* souhrn: cena za položku smí spadnout pod počítadlo */
+  .souhrn__radek { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+  .souhrn__popis { flex: 1 0 100%; }
+  .souhrn__castka { min-width: 0; margin-left: auto; }
+}
+
+@media (max-width: 300px) {
+  /* ceník: ikona nad názvem, text přes celou šířku */
+  .polozka__info { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .polozka__info > div { max-width: 100%; }   /* sloupec se neroztáhne na nejdelší slovo */
+  .polozka__nazev { font-size: 19px; }
+  /* košík jako karta: souhrn nahoře, tlačítko přes celou šířku */
+  .kosik { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; border-radius: 22px; }
+  .kosik__text { flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 2px 10px; padding: 2px 8px 0; white-space: normal; }
+  .kosik__btn { width: 100%; }
+  .hlaska { bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
+  /* citát: portrét nad textem */
+  .pribeh__citat { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+@media (max-width: 250px) {
+  /* zásady: ikona nad textem */
+  .zasady__seznam li { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .zasady__seznam p { max-width: 100%; overflow-wrap: break-word; }
+}
+
+@media (max-width: 200px) {
+  /* zvětšení nad 200 %: dlouhé slovo se raději zalomí, než aby se uřízlo;
+     telefon se smí zalomit, menší logo, užší okraje a počítadla */
+  body { overflow-wrap: anywhere; }
+  .lista .znacka__script { font-size: min(40px, 22vw); }
+  .lista__tel { white-space: normal; text-align: center; padding: 6px 14px; border-radius: 18px; }
+  .hero__akce .btn { padding: 0 18px; }
+  .hero__akce .btn::after { display: none; }
+  .polozka { padding-inline: 12px; }
+  .stepper button { width: 36px; height: 40px; }
+  .stepper output { min-width: 22px; }
+  .radios span { padding: 0 14px 0 12px; }
+  h1, h2, h3 { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 160px) {
+  /* zvětšení 250–300 %: počítadlo se musí vejít vedle sebe */
+  .polozka { padding-inline: 8px; }
+  .stepper button { width: 30px; }
+  .stepper output { min-width: 16px; }
+}
+@media (max-width: 140px) {
+  .stepper button { width: 25px; }
 }
 
 @media (min-width: 760px) {
