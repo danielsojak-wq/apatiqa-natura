@@ -10,6 +10,10 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwPVkooLDxoUwf3XyQraoW
    přes doGet na ENDPOINT — mamka ceny a produkty edituje v tabulce.
    Struktura jedné varianty musí zůstat { id, label, cena }; stojí na
    ní výběr množství i souhrn.
+   Apps Script odpovídá 2–3 s, proto si prohlížeč poslední ceník
+   pamatuje (localStorage). Při další návštěvě se ukáže hned a po
+   stažení čerstvého se překreslí, jen když se v tabulce něco změnilo.
+   Cenu objednávky vždy počítá skript z tabulky, ne z prohlížeče.
    ----------------------------------------------------------------- */
 
 let KATALOG = [];   // [{ nazev, barva, polozky: [{ nazev, popis, ikona, varianty: [{ id, label, cena }] }] }]
@@ -24,6 +28,8 @@ const BARVY_KATEGORII = {
 const BARVY_DALSI = ['#3C5330', '#55683D', '#6E7F4F', '#8A6A5B'];
 
 const LIMIT_NACTENI = 15000;   // ms; pak se místo ceníku ukáže telefon
+const KLIC_CENIKU = 'apatiqa-cenik';                // localStorage
+const MAX_STARI_CENIKU = 14 * 24 * 60 * 60 * 1000;  // starší uložený ceník se neukáže
 
 /* Náhled na localhostu: dokud je ENDPOINT prázdný, ceník se vezme
    z ukazka-ceniku.json (stejný tvar jako odpověď doGet). Na ostrém
@@ -75,8 +81,8 @@ function sestavKatalog(produkty) {
   return kategorie;
 }
 
-async function nactiKatalog() {
-  const zdroj = ENDPOINT || (JE_LOCALHOST ? UKAZKOVY_CENIK : '');
+/* Stáhne řádky ceníku (odpověď doGet). Vyhodí chybu, když se nepovede. */
+async function stahniCenik(zdroj) {
   if (!zdroj) throw new Error('ENDPOINT v app.js není vyplněný.');
   if (!ENDPOINT) console.warn('ENDPOINT je prázdný, ceník je ukázkový z ' + UKAZKOVY_CENIK + '.');
 
@@ -88,15 +94,47 @@ async function nactiKatalog() {
     if (!odpoved.ok) throw new Error('HTTP ' + odpoved.status);
     const data = await odpoved.json();
     if (!data || !Array.isArray(data.produkty)) throw new Error((data && data.chyba) || 'Neplatná odpověď.');
-    const katalog = sestavKatalog(data.produkty);
-    if (!katalog.length) throw new Error('V ceníku není nic aktivního.');
-    return katalog;
+    return data.produkty;
   } finally {
     clearTimeout(casovac);
   }
 }
 
+/* Uložený ceník z minulé návštěvy, nebo null. localStorage může být
+   vypnutý (anonymní okno, zablokovaná data), proto všude try/catch.  */
+function ulozenyCenik(zdroj) {
+  try {
+    const u = JSON.parse(localStorage.getItem(KLIC_CENIKU));
+    if (u && u.zdroj === zdroj && Array.isArray(u.produkty) && Date.now() - u.cas < MAX_STARI_CENIKU) return u.produkty;
+  } catch (_) { /* bez uloženého ceníku */ }
+  return null;
+}
+
+function ulozCenik(zdroj, produkty) {
+  try {
+    if (produkty) localStorage.setItem(KLIC_CENIKU, JSON.stringify({ zdroj, cas: Date.now(), produkty }));
+    else localStorage.removeItem(KLIC_CENIKU);
+  } catch (_) { /* nevadí, příště se jen čeká déle */ }
+}
+
+/* Vykreslí ceník z řádků doGet; vybraná množství zůstanou.
+   Vrací false, když v řádcích není nic k prodeji.                  */
+function zobrazCenik(produkty) {
+  const katalog = sestavKatalog(produkty);
+  if (!katalog.length) return false;
+  KATALOG = katalog;
+  vykresliKatalog();
+  vykresliRozcestnik();
+  vykresliSouhrn();
+  return true;
+}
+
 function vykresliChybuKatalogu() {
+  KATALOG = [];
+  const nav = document.getElementById('rozcestnik');
+  if (nav) nav.hidden = true;
+  vykresliSouhrn();
+
   const cil = document.getElementById('katalog');
   cil.textContent = '';
   const zprava = el('p', 'katalog__loading', 'Ceník se teď nepodařilo načíst. Objednat můžete telefonicky na ');
@@ -176,7 +214,9 @@ function stepper(polozka, v) {
   ubrat.type = 'button';
   ubrat.setAttribute('aria-label', 'Ubrat ' + polozka.nazev + ' ' + v.label);
 
-  const pocet = el('output', null, '0');
+  // Při překreslení na čerstvý ceník drží stepper už vybrané množství.
+  const vybrano = mnozstvi[v.id] || 0;
+  const pocet = el('output', vybrano ? 'ma-hodnotu' : null, String(vybrano));
   pocet.id = 'out-' + v.id;
 
   const pridat = el('button', null, '+');
@@ -284,6 +324,7 @@ function vykresliSouhrn() {
 
 const odkazyKategorii = [];        // [{ odkaz, pocet }] ve stejném pořadí jako KATALOG
 const naObrazovce = new Set();     // sekce, při kterých se košík schová
+let pozorovatelKategorii = null;   // při překreslení ceníku se starý odpojí
 
 function slovoKus(n) {
   if (n === 1) return 'kus';
@@ -333,7 +374,8 @@ function vykresliRozcestnik() {
   nav.hidden = false;
 
   if (!('IntersectionObserver' in window)) return;
-  const pozorovatel = new IntersectionObserver((zaznamy) => {
+  if (pozorovatelKategorii) pozorovatelKategorii.disconnect();
+  const pozorovatel = pozorovatelKategorii = new IntersectionObserver((zaznamy) => {
     zaznamy.forEach((z) => {
       if (!z.isIntersecting) return;
       const i = Number(z.target.id.replace('kategorie-', '')) - 1;
@@ -444,13 +486,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   hlidejKosik();
   document.getElementById('form').addEventListener('submit', odesli);
 
-  // Do konce načítání zůstává v #katalog text „Načítám ceník…“ z index.html.
+  // Uložený ceník z minulé návštěvy hned; jinak do konce načítání
+  // zůstává v #katalog text „Načítám ceník…“ z index.html.
+  const zdroj = ENDPOINT || (JE_LOCALHOST ? UKAZKOVY_CENIK : '');
+  const ulozeny = ulozenyCenik(zdroj);
+  const zUlozeneho = Boolean(ulozeny && zobrazCenik(ulozeny));
+
+  let produkty;
   try {
-    KATALOG = await nactiKatalog();
-    vykresliKatalog();
-    vykresliRozcestnik();
+    produkty = await stahniCenik(zdroj);
   } catch (chyba) {
     console.error('Ceník se nenačetl:', chyba);
+    if (!zUlozeneho) vykresliChybuKatalogu();   // jinak zůstane uložený ceník
+    return;
+  }
+
+  if (zUlozeneho && JSON.stringify(produkty) === JSON.stringify(ulozeny)) {
+    ulozCenik(zdroj, produkty);                 // beze změny, jen obnoví čas
+  } else if (zobrazCenik(produkty)) {
+    ulozCenik(zdroj, produkty);
+  } else {
+    console.error('Ceník se nenačetl: v ceníku není nic aktivního.');
+    ulozCenik(zdroj, null);
     vykresliChybuKatalogu();
   }
 });
